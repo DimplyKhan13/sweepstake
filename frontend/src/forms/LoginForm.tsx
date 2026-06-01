@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useLoginMutation } from '../api/authApi'
 import { tournamentApi } from '../api/tournamentApi'
 import { useAppDispatch } from '../store/hooks'
@@ -7,6 +8,7 @@ import { getApiErrorMessage } from '../api/apiError'
 import { useGetConfigQuery } from '../api/configApi'
 
 export function LoginForm() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get('redirect')
@@ -58,12 +60,12 @@ export function LoginForm() {
       <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
         Sweep<span className="text-teal-500">Stake</span>
       </h1>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Sign in</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('auth.signIn')}</h2>
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{getApiErrorMessage(error, 'Login failed')}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">{getApiErrorMessage(error, t('auth.loginFailed'))}</p>
       )}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.email')}</label>
         <input
           type="email"
           required
@@ -73,7 +75,7 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.password')}</label>
         <input
           type="password"
           required
@@ -87,17 +89,17 @@ export function LoginForm() {
         disabled={isLoading || !email || !password}
         className="w-full rounded bg-teal-600 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 dark:bg-teal-500 dark:hover:bg-teal-600"
       >
-        {isLoading ? 'Signing in…' : 'Sign in'}
+        {isLoading ? t('auth.signingIn') : t('auth.signIn')}
       </button>
       <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-        No account?{' '}
+        {t('auth.noAccount')}{' '}
         <Link to={`/register${searchParams.toString() ? `?${searchParams.toString()}` : ''}`} className="text-teal-600 hover:underline dark:text-teal-400">
-          Register
+          {t('auth.register')}
         </Link>
       </p>
       <p className="text-center text-sm text-gray-500 dark:text-gray-400">
         <Link to="/forgot-password" className="text-teal-600 hover:underline dark:text-teal-400">
-          Forgot password?
+          {t('auth.forgotPassword')}
         </Link>
       </p>
     </form>

@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useForgotPasswordMutation } from '../api/authApi'
 import { getApiErrorMessage } from '../api/apiError'
 
 export function ForgotPasswordForm() {
+  const { t } = useTranslation()
   const [forgotPassword, { isLoading, error }] = useForgotPasswordMutation()
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -23,23 +25,23 @@ export function ForgotPasswordForm() {
       <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
         Sweep<span className="text-teal-500">Stake</span>
       </h1>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Reset password</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('auth.resetPassword')}</h2>
       {submitted ? (
         <p className="text-sm text-green-600 dark:text-green-400">
-          If that email is registered you will receive a reset link shortly.
+          {t('auth.resetSuccess')}
         </p>
       ) : (
         <>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Enter your email address and we'll send you a link to reset your password.
+            {t('auth.resetDescription')}
           </p>
           {error && (
             <p className="text-sm text-red-600 dark:text-red-400">
-              {getApiErrorMessage(error, 'Something went wrong')}
+              {getApiErrorMessage(error, t('auth.somethingWentWrong'))}
             </p>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.email')}</label>
             <input
               type="email"
               required
@@ -53,13 +55,13 @@ export function ForgotPasswordForm() {
             disabled={isLoading || !email}
             className="w-full rounded bg-teal-600 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 dark:bg-teal-500 dark:hover:bg-teal-600"
           >
-            {isLoading ? 'Sending…' : 'Send reset link'}
+            {isLoading ? t('auth.sending') : t('auth.sendResetLink')}
           </button>
         </>
       )}
       <p className="text-center text-sm text-gray-500 dark:text-gray-400">
         <Link to="/login" className="text-teal-600 hover:underline dark:text-teal-400">
-          Back to sign in
+          {t('auth.backToSignIn')}
         </Link>
       </p>
     </form>

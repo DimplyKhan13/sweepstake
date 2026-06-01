@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ModalShell, ModalBody } from './base'
 import {
   useGetGroupStatsQuery,
@@ -21,12 +22,13 @@ function WinnerPredictionsTable({
   tournamentId: number
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const currentUserId = useAppSelector((state) => state.auth.user?.id)
 
   if (predictions.length === 0) {
     return (
-      <p className="text-sm text-gray-500 dark:text-gray-400">No predictions were made.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('winnerStats.noPredictions')}</p>
     )
   }
 
@@ -93,9 +95,10 @@ function WinnerPredictionsTable({
 // Actual-result badge (Group / Stage)
 // ---------------------------------------------------------------------------
 function WinnerBadge({ team }: { team: { name: string; image_url: string | null } | null | undefined }) {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center justify-center gap-2.5 py-1">
-      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Winner:</span>
+      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('winnerStats.winner')}</span>
       {team ? (
         <span className="inline-flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-gray-100">
           {team.image_url && (
@@ -109,7 +112,7 @@ function WinnerBadge({ team }: { team: { name: string; image_url: string | null 
           {team.name}
         </span>
       ) : (
-        <span className="text-base text-gray-400 dark:text-gray-500 italic">not decided yet</span>
+        <span className="text-base text-gray-400 dark:text-gray-500 italic">{t('winnerStats.notDecided')}</span>
       )}
     </div>
   )
@@ -129,13 +132,14 @@ export function GroupStatsModal({
   tournamentId: number
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: stats, isLoading, error } = useGetGroupStatsQuery(groupId)
 
   return (
-    <ModalShell title={`${groupName} — Predictions`} onClose={onClose} maxWidth="max-w-lg">
+    <ModalShell title={t('winnerStats.predictionsTitle', { name: groupName })} onClose={onClose} maxWidth="max-w-lg">
       <ModalBody scrollable>
-        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading stats…</p>}
-        {error && <p className="text-sm text-red-500 dark:text-red-400">Failed to load group stats.</p>}
+        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">{t('winnerStats.loading')}</p>}
+        {error && <p className="text-sm text-red-500 dark:text-red-400">{t('winnerStats.failedGroup')}</p>}
         {stats && (
           <div className="space-y-4">
             <WinnerBadge team={stats.actual_winner_team} />
@@ -165,13 +169,14 @@ export function StageStatsModal({
   tournamentId: number
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: stats, isLoading, error } = useGetStageStatsQuery(stageId)
 
   return (
-    <ModalShell title={`${stageName} — Predictions`} onClose={onClose} maxWidth="max-w-lg">
+    <ModalShell title={t('winnerStats.predictionsTitle', { name: stageName })} onClose={onClose} maxWidth="max-w-lg">
       <ModalBody scrollable>
-        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading stats…</p>}
-        {error && <p className="text-sm text-red-500 dark:text-red-400">Failed to load stage stats.</p>}
+        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">{t('winnerStats.loading')}</p>}
+        {error && <p className="text-sm text-red-500 dark:text-red-400">{t('winnerStats.failedStage')}</p>}
         {stats && (
           <div className="space-y-4">
             <WinnerBadge team={stats.actual_winner_team} />
@@ -199,6 +204,7 @@ export function TournamentStatsModal({
   tournamentName: string
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: stats, isLoading, error } = useGetTournamentStatsQuery(tournamentId)
 
   function PlaceRow({
@@ -230,17 +236,17 @@ export function TournamentStatsModal({
             {team.name}
           </span>
         ) : (
-          <span className={`text-gray-400 dark:text-gray-500 italic ${textSize}`}>not decided yet</span>
+          <span className={`text-gray-400 dark:text-gray-500 italic ${textSize}`}>{t('winnerStats.notDecided')}</span>
         )}
       </div>
     )
   }
 
   return (
-    <ModalShell title={`${tournamentName} — Winner Predictions`} onClose={onClose} maxWidth="max-w-lg">
+    <ModalShell title={t('winnerStats.winnerPredictionsTitle', { name: tournamentName })} onClose={onClose} maxWidth="max-w-lg">
       <ModalBody scrollable>
-        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">Loading stats…</p>}
-        {error && <p className="text-sm text-red-500 dark:text-red-400">Failed to load tournament stats.</p>}
+        {isLoading && <p className="text-sm text-gray-500 dark:text-gray-400">{t('winnerStats.loading')}</p>}
+        {error && <p className="text-sm text-red-500 dark:text-red-400">{t('winnerStats.failedTournament')}</p>}
         {stats && (
           <div className="space-y-4">
             <div className="flex flex-col gap-2 py-1">

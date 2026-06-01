@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useListGroupsQuery, useCreateGroupMutation, useUpdateGroupMutation, useDeleteGroupMutation } from '../api/groupApi'
 import { useListTeamsQuery, useCreateTeamMutation, useUpdateTeamMutation, useDeleteTeamMutation } from '../api/teamApi'
 import {
@@ -48,10 +49,11 @@ function TeamFormFields({
   onEnter?: () => void
   disabled?: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <div>
-        <FieldLabel>Name</FieldLabel>
+        <FieldLabel>{t('team.name')}</FieldLabel>
         <input
           autoFocus={autoFocus}
           type="text"
@@ -63,18 +65,18 @@ function TeamFormFields({
         />
       </div>
       <div>
-        <FieldLabel>ISO code</FieldLabel>
+        <FieldLabel>{t('team.isoCode')}</FieldLabel>
         <input
           type="text"
           value={isoCode}
           onChange={(e) => setIsoCode(e.target.value)}
-          placeholder="e.g. DE"
+          placeholder={t('team.isoPlaceholder')}
           disabled={disabled}
           className={fieldClass}
         />
       </div>
       <div>
-        <FieldLabel>Image URL</FieldLabel>
+        <FieldLabel>{t('team.imageUrl')}</FieldLabel>
         <input
           type="url"
           value={imageUrl}
@@ -85,9 +87,9 @@ function TeamFormFields({
         />
       </div>
       <div>
-        <FieldLabel>Group</FieldLabel>
+        <FieldLabel>{t('team.group')}</FieldLabel>
         <select value={groupId} onChange={(e) => setGroupId(e.target.value)} disabled={disabled} className={fieldClass}>
-          <option value="">— no group —</option>
+          <option value="">{t('team.noGroup')}</option>
           {groups.map((g) => (
             <option key={g.id} value={g.id}>
               {g.name}
@@ -112,6 +114,7 @@ export function EditTeamModal({
   tournamentId: number
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: groups = [] } = useListGroupsQuery(tournamentId)
   const [updateTeam, { isLoading: isSaving }] = useUpdateTeamMutation()
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation()
@@ -139,23 +142,23 @@ export function EditTeamModal({
       }).unwrap()
       onClose()
     } catch {
-      setError('Failed to save changes. Please try again.')
+      setError(t('team.failedSave'))
     }
   }
 
   async function handleDelete() {
-    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return
+    if (!window.confirm(t('team.deleteConfirm', { name }))) return
     setError(null)
     try {
       await deleteTeam({ id: team.id, tournamentId }).unwrap()
       onClose()
     } catch {
-      setError('Failed to delete team. Please try again.')
+      setError(t('team.failedDelete'))
     }
   }
 
   return (
-    <ModalShell title="Edit Team" onClose={onClose} zIndex="z-[80]" maxWidth="max-w-sm">
+    <ModalShell title={t('team.editTeam')} onClose={onClose} zIndex="z-[80]" maxWidth="max-w-sm">
       <ModalBody>
         <TeamFormFields
           name={name} setName={setName}
@@ -169,12 +172,12 @@ export function EditTeamModal({
       </ModalBody>
       <ModalFooter justify="between">
         <BtnDanger onClick={handleDelete} disabled={isLoading} loading={isDeleting}>
-          {isDeleting ? 'Deleting…' : 'Delete'}
+          {isDeleting ? t('common.deleting') : t('common.delete')}
         </BtnDanger>
         <div className="flex gap-2">
-          <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+          <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
           <BtnPrimary onClick={handleSave} disabled={isLoading || !name.trim()} loading={isSaving}>
-            {isSaving ? 'Saving…' : 'Save'}
+            {isSaving ? t('common.saving') : t('common.save')}
           </BtnPrimary>
         </div>
       </ModalFooter>
@@ -195,6 +198,7 @@ export function AddTeamModal({
   onCreated: (teamId: number) => void
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: groups = [] } = useListGroupsQuery(tournamentId)
   const [createTeam, { isLoading: isSaving }] = useCreateTeamMutation()
 
@@ -218,12 +222,12 @@ export function AddTeamModal({
       onCreated(team.id)
       onClose()
     } catch {
-      setError('Failed to create team. Please try again.')
+      setError(t('team.failedCreate'))
     }
   }
 
   return (
-    <ModalShell title="Add Team" onClose={onClose} zIndex="z-[80]" maxWidth="max-w-sm">
+    <ModalShell title={t('team.addTeam')} onClose={onClose} zIndex="z-[80]" maxWidth="max-w-sm">
       <ModalBody>
         <TeamFormFields
           name={name} setName={setName}
@@ -238,9 +242,9 @@ export function AddTeamModal({
         <ErrorMsg msg={error} />
       </ModalBody>
       <ModalFooter>
-        <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+        <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
         <BtnPrimary onClick={handleSave} disabled={isSaving || !name.trim()} loading={isSaving}>
-          {isSaving ? 'Saving…' : 'Add'}
+          {isSaving ? t('common.saving') : t('common.add')}
         </BtnPrimary>
       </ModalFooter>
     </ModalShell>
@@ -260,6 +264,7 @@ export function TeamPickerModal({
   onSelect: (teamId: number) => void
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: teams = [] } = useListTeamsQuery(tournamentId)
   const { data: groups = [] } = useListGroupsQuery(tournamentId)
   const [createGroup, { isLoading: isCreatingGroup }] = useCreateGroupMutation()
@@ -303,7 +308,7 @@ export function TeamPickerModal({
       await createGroup({ name: newGroupName.trim(), tournament_id: tournamentId }).unwrap()
       setNewGroupName('')
     } catch {
-      setCreateGroupError('Failed to create group.')
+      setCreateGroupError(t('team.failedCreateGroup'))
     }
   }
 
@@ -332,7 +337,7 @@ export function TeamPickerModal({
         />
       )}
       <ModalBox maxWidth="max-w-sm" flex>
-        <ModalHeader title="Select Team" onClose={onClose}>
+        <ModalHeader title={t('team.selectTeam')} onClose={onClose}>
           <button
             type="button"
             onClick={() => setShowAddTeam(true)}
@@ -346,7 +351,7 @@ export function TeamPickerModal({
         <div className="overflow-y-auto flex-1 px-4 py-3 space-y-3 max-h-[80vh]">
           {groupedTeams.length === 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400 px-2">
-              No teams yet. Add one above.
+              {t('team.noTeams')}
             </p>
           )}
           {groupedTeams.map(({ groupName, groupId, teamList }) => {
@@ -366,7 +371,7 @@ export function TeamPickerModal({
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
                       >
-                        <option value="">— winner —</option>
+                        <option value="">{t('team.winner')}</option>
                         {teamList.map((t) => (
                           <option key={t.id} value={t.id}>{t.name}</option>
                         ))}
@@ -428,7 +433,7 @@ export function TeamPickerModal({
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleCreateGroup() }}
-              placeholder="New group name…"
+              placeholder={t('team.newGroupPlaceholder')}
               disabled={isCreatingGroup}
               className="flex-1 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
             />

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   useListStagesQuery,
   useCreateStageMutation,
@@ -16,6 +17,7 @@ export function StageManagerModal({
   tournamentId: number
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: stages = [] } = useListStagesQuery(tournamentId)
   const { data: teams = [] } = useListTeamsQuery(tournamentId)
   const [createStage, { isLoading: isCreating }] = useCreateStageMutation()
@@ -64,14 +66,14 @@ export function StageManagerModal({
   return (
     <ModalBackdrop zIndex="z-[60]">
       <ModalBox maxWidth="max-w-sm">
-        <ModalHeader title="Manage Stages" onClose={onClose} />
+        <ModalHeader title={t('stage.manageStages')} onClose={onClose} />
         <div className="px-6 py-4 space-y-2 max-h-80 overflow-y-auto">
           <div className="flex items-center gap-2 pb-1">
             <span className="flex-1 min-w-0 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              Stage
+              {t('stage.stageCol')}
             </span>
             <span className="flex-1 min-w-0 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              Winner
+              {t('stage.winnerCol')}
             </span>
             <span className="w-[15px] flex-shrink-0" />
           </div>
@@ -96,7 +98,7 @@ export function StageManagerModal({
                 disabled={isLoading}
                 className={`flex-1 min-w-0 ${fieldClass}`}
               >
-                <option value="">— No winner —</option>
+                <option value="">{t('stage.noWinner')}</option>
                 {teams.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -108,9 +110,7 @@ export function StageManagerModal({
                 onClick={() => {
                   const name = editNames[s.id] ?? s.name
                   if (
-                    window.confirm(
-                      `Delete stage "${name}"? This cannot be undone and all matches in this stage will re-assigned to "Unknown Stage".`,
-                    )
+                    window.confirm(t('stage.deleteConfirm', { name }))
                   ) {
                     deleteStage({ id: s.id, tournamentId })
                   }
@@ -131,7 +131,7 @@ export function StageManagerModal({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleCreate()
               }}
-              placeholder="New stage name…"
+              placeholder={t('stage.newStagePlaceholder')}
               disabled={isLoading}
               className="flex-1 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
             />
@@ -147,7 +147,7 @@ export function StageManagerModal({
           </div>
         </div>
         <ModalFooter>
-          <BtnPrimary onClick={onClose}>Done</BtnPrimary>
+          <BtnPrimary onClick={onClose}>{t('common.done')}</BtnPrimary>
         </ModalFooter>
       </ModalBox>
     </ModalBackdrop>

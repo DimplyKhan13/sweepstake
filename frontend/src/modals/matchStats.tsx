@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ModalShell, ModalBody } from './base'
 import { useGetMatchStatsQuery } from '../api/statsApi'
 import { formatDateTime } from '../utils/datetime'
@@ -17,6 +18,7 @@ export function MatchStatsModal({
   match: Match | undefined
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: stats, isLoading, error } = useGetMatchStatsQuery(matchId)
   const navigate = useNavigate()
   const currentUserId = useAppSelector((state) => state.auth.user?.id)
@@ -28,10 +30,10 @@ export function MatchStatsModal({
     <ModalShell title={`${homeTeam} vs ${awayTeam}`} onClose={onClose} maxWidth="max-w-lg">
       <ModalBody scrollable>
         {isLoading && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading stats…</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('matchStats.loading')}</p>
         )}
         {error && (
-          <p className="text-sm text-red-500 dark:text-red-400">Failed to load match stats.</p>
+          <p className="text-sm text-red-500 dark:text-red-400">{t('matchStats.failedLoad')}</p>
         )}
         {stats && (
           <div className="space-y-5">
@@ -41,7 +43,7 @@ export function MatchStatsModal({
                   ? `${stats.home_goals} – ${stats.away_goals}`
                   : '– : –'}
               </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Final Score</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('matchStats.finalScore')}</p>
               {stats.start_datetime && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   {formatDateTime(stats.start_datetime)}
@@ -51,20 +53,20 @@ export function MatchStatsModal({
 
             {stats.predictions.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                No predictions were made for this match.
+                {t('matchStats.noPredictions')}
               </p>
             ) : (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left pb-2 font-medium text-gray-500 dark:text-gray-400">
-                      Player
+                      {t('matchStats.player')}
                     </th>
                     <th className="text-center pb-2 font-medium text-gray-500 dark:text-gray-400">
-                      Prediction
+                      {t('matchStats.prediction')}
                     </th>
                     <th className="text-right pb-2 font-medium text-gray-500 dark:text-gray-400">
-                      Points
+                      {t('matchStats.points')}
                     </th>
                   </tr>
                 </thead>

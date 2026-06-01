@@ -1,6 +1,7 @@
 import { useState, Fragment, useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Pencil, Plus, Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGetTournamentQuery } from '../api/tournamentApi'
 import { useListMatchesQuery } from '../api/matchApi'
 import { useListGroupsQuery } from '../api/groupApi'
@@ -18,6 +19,7 @@ import { formatDateTime } from '../utils/datetime'
 import { groupByStage } from '../utils/match'
 
 export function TournamentPage() {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const tournamentId = Number(id)
@@ -67,7 +69,7 @@ export function TournamentPage() {
     return (
       <PageShell>
         <div className="flex h-48 items-center justify-center p-8 text-gray-500 dark:text-gray-400">
-          Loading Tournament…
+          {t('tournament.loading')}
         </div>
       </PageShell>
     )
@@ -77,16 +79,16 @@ export function TournamentPage() {
     return (
       <PageShell>
         <div className="p-6 sm:p-8 space-y-4 max-w-md">
-          <h2 className="text-lg font-semibold text-red-500 dark:text-red-400">SweepStake not found</h2>
+          <h2 className="text-lg font-semibold text-red-500 dark:text-red-400">{t('tournament.notFound')}</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            If a friend invited you to their SweepStake, ask them for a <span className="font-mono font-semibold text-gray-800 dark:text-gray-200">join code</span> and enter it on the overview page to join.
+            {t('tournament.notFoundDesc')}
           </p>
           <button
             onClick={() => navigate('/overview')}
             className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition"
           >
             <ArrowLeft size={14} />
-            Go to overview
+            {t('tournament.goToOverview')}
           </button>
         </div>
       </PageShell>
@@ -100,7 +102,7 @@ export function TournamentPage() {
       className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition"
     >
       <Pencil size={14} />
-      Edit
+      {t('tournament.edit')}
     </button>
   ) : undefined
 
@@ -176,7 +178,7 @@ export function TournamentPage() {
         {/* Rules */}
         {rules.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold mb-3">Scoring Rules</h2>
+            <h2 className="text-lg font-semibold mb-3">{t('tournament.scoringRules')}</h2>
             <ul className="divide-y divide-gray-100 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               {rules.map((r) => (
                 <li key={r.label} className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800">
@@ -194,14 +196,14 @@ export function TournamentPage() {
         <section>
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-3">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold">Matches</h2>
+              <h2 className="text-lg font-semibold">{t('tournament.matches')}</h2>
               {isAdmin && (
                 <button
                   onClick={() => setShowAddMatch(true)}
                   className="inline-flex items-center gap-1 rounded-full bg-blue-600 hover:bg-blue-700 px-2.5 py-1 text-xs font-medium text-white transition"
                 >
                   <Plus size={13} />
-                  Add
+                  {t('tournament.add')}
                 </button>
               )}
               {isAdmin && (
@@ -210,7 +212,7 @@ export function TournamentPage() {
                   className="inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 dark:hover:text-blue-400 transition"
                 >
                   <Pencil size={12} />
-                  Teams
+                  {t('tournament.teams')}
                 </button>
               )}
               {isAdmin && (
@@ -219,7 +221,7 @@ export function TournamentPage() {
                   className="inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 dark:hover:text-blue-400 transition"
                 >
                   <Pencil size={12} />
-                  Stages
+                  {t('tournament.stages')}
                 </button>
               )}
               {filterIso != null && (() => {
@@ -265,24 +267,24 @@ export function TournamentPage() {
                 }, { replace: true })}
                 className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300 py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
-                <option value="">All groups</option>
+                <option value="">{t('tournament.allGroups')}</option>
                 {groups.map((g) => (
-                  <option key={g.id} value={g.id}>Group {g.name}</option>
+                  <option key={g.id} value={g.id}>{t('tournament.group', { name: g.name })}</option>
                 ))}
               </select>
             )}
           </div>
 
           {mLoading && (
-            <p className="text-gray-500 dark:text-gray-400">Loading matches…</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('tournament.loadingMatches')}</p>
           )}
 
           {mError && (
-            <p className="text-red-500 dark:text-red-400">Failed to load matches.</p>
+            <p className="text-red-500 dark:text-red-400">{t('tournament.failedToLoadMatches')}</p>
           )}
 
           {!mLoading && !mError && grouped.size === 0 && visibleMatches.length === 0 && hiddenPastCount === 0 && (
-            <p className="text-gray-500 dark:text-gray-400">No matches scheduled yet.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('tournament.noMatchesScheduled')}</p>
           )}
 
           {!showAllPast && hiddenPastCount > 0 && (
@@ -295,7 +297,7 @@ export function TournamentPage() {
                 <svg className="h-4 w-4 rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
                 </svg>
-                {hiddenPastCount} past {hiddenPastCount === 1 ? 'match' : 'matches'}
+                {t('tournament.pastMatch', { count: hiddenPastCount })}
                 <svg className="h-4 w-4 rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
                 </svg>
@@ -336,7 +338,7 @@ export function TournamentPage() {
                           <span className="flex-1 h-0.5 bg-red-500 relative overflow-hidden rounded-full">
                             <span className="animate-now-line bg-gradient-to-r from-transparent via-white to-transparent" />
                           </span>
-                          <span className="text-xs font-semibold text-red-500 whitespace-nowrap animate-now-text">Now</span>
+                          <span className="text-xs font-semibold text-red-500 whitespace-nowrap animate-now-text">{t('tournament.now')}</span>
                         </li>
                       )}
                     <li
@@ -354,7 +356,7 @@ export function TournamentPage() {
                               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
                             </span>
                             <span className="font-semibold text-red-500 animate-now-text tabular-nums">
-                              Live <ElapsedTime
+                              {t('tournament.live')} <ElapsedTime
                                 startMs={matchStartMs}
                                 maxMs={matchStartMs + 100 * 60 * 1000}
                                 onMax={() => setRenderTick((n) => n + 1)}

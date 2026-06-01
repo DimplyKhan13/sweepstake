@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useCreateMatchMutation, useUpdateMatchMutation, useDeleteMatchMutation } from '../api/matchApi'
 import { useListStagesQuery } from '../api/groupApi'
 import { useListTeamsQuery } from '../api/teamApi'
@@ -61,6 +62,7 @@ function TeamSelector({
   onAddNew: () => void
   disabled?: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
@@ -110,7 +112,7 @@ function TeamSelector({
           disabled={disabled}
           className="w-full rounded border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-400 dark:text-gray-500 hover:border-blue-400 hover:text-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition text-left"
         >
-          — select team —
+          {t('match.selectTeam')}
         </button>
       )}
     </div>
@@ -130,6 +132,7 @@ export function MatchModal({
   match?: Match
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const { data: teams = [] } = useListTeamsQuery(tournamentId)
   const { data: stages = [] } = useListStagesQuery(tournamentId)
   const [createMatch, { isLoading: isCreating }] = useCreateMatchMutation()
@@ -152,7 +155,7 @@ export function MatchModal({
   async function handleSave() {
     setError(null)
     if (!datetime) {
-      setError('Start date and time is required.')
+      setError(t('match.startRequired'))
       return
     }
     try {
@@ -184,16 +187,14 @@ export function MatchModal({
       }
       onClose()
     } catch {
-      setError('Failed to save changes. Please try again.')
+      setError(t('match.failedSave'))
     }
   }
 
   async function handleDelete() {
     if (!match) return
     if (
-      !window.confirm(
-        'Delete this match? This cannot be undone and all user predictions will also be unrecoverably deleted.',
-      )
+      !window.confirm(t('match.deleteConfirm'))
     )
       return
     setError(null)
@@ -201,7 +202,7 @@ export function MatchModal({
       await deleteMatch({ id: match.id, tournamentId }).unwrap()
       onClose()
     } catch {
-      setError('Failed to delete match. Please try again.')
+      setError(t('match.failedDelete'))
     }
   }
 
@@ -231,10 +232,10 @@ export function MatchModal({
         />
       )}
       <ModalBox>
-        <ModalHeader title={match ? 'Edit Match' : 'Add Match'} onClose={onClose} />
+        <ModalHeader title={match ? t('match.editMatch') : t('match.addMatch')} onClose={onClose} />
         <ModalBody scrollable>
           <div>
-            <FieldLabel>Start date &amp; time</FieldLabel>
+            <FieldLabel>{t('match.startDateTime')}</FieldLabel>
             <input
               type="datetime-local"
               value={datetime}
@@ -245,7 +246,7 @@ export function MatchModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <TeamSelector
-              label="Home team"
+              label={t('match.homeTeam')}
               teamId={homeTeamId}
               team={homeTeam}
               onPick={() => setTeamPickerFor('home')}
@@ -254,7 +255,7 @@ export function MatchModal({
               disabled={isLoading}
             />
             <TeamSelector
-              label="Away team"
+              label={t('match.awayTeam')}
               teamId={awayTeamId}
               team={awayTeam}
               onPick={() => setTeamPickerFor('away')}
@@ -265,7 +266,7 @@ export function MatchModal({
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Stage</label>
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('match.stage')}</label>
               <button
                 type="button"
                 onClick={() => setShowStageManager(true)}
@@ -282,7 +283,7 @@ export function MatchModal({
               disabled={isLoading}
               className={fieldClass}
             >
-              <option value="">— none —</option>
+              <option value="">{t('common.none')}</option>
               {stages.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -298,7 +299,7 @@ export function MatchModal({
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <FieldLabel>Home goals</FieldLabel>
+              <FieldLabel>{t('match.homeGoals')}</FieldLabel>
               <input
                 type="number"
                 min="0"
@@ -310,7 +311,7 @@ export function MatchModal({
               />
             </div>
             <div>
-              <FieldLabel>Away goals</FieldLabel>
+              <FieldLabel>{t('match.awayGoals')}</FieldLabel>
               <input
                 type="number"
                 min="0"
@@ -323,12 +324,12 @@ export function MatchModal({
             </div>
           </div>
           <div>
-            <FieldLabel>TV channel</FieldLabel>
+            <FieldLabel>{t('match.tvChannel')}</FieldLabel>
             <input
               type="text"
               value={tvChannel}
               onChange={(e) => setTvChannel(e.target.value)}
-              placeholder="e.g. BBC One"
+              placeholder={t('match.tvChannelPlaceholder')}
               disabled={isLoading}
               className={fieldClass}
             />
@@ -339,14 +340,14 @@ export function MatchModal({
           <div>
             {match && (
               <BtnDanger onClick={handleDelete} disabled={isLoading} loading={isDeleting}>
-                {isDeleting ? 'Deleting…' : 'Delete'}
+                {isDeleting ? t('common.deleting') : t('common.delete')}
               </BtnDanger>
             )}
           </div>
           <div className="flex gap-2">
-            <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+            <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
             <BtnPrimary onClick={handleSave} disabled={isLoading} loading={isCreating || isUpdating}>
-              {isCreating || isUpdating ? 'Saving…' : 'Save'}
+              {isCreating || isUpdating ? t('common.saving') : t('common.save')}
             </BtnPrimary>
           </div>
         </ModalFooter>

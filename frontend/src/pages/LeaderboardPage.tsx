@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGetTournamentQuery } from '../api/tournamentApi'
 import { useGetLeaderboardQuery } from '../api/statsApi'
 import { useAppSelector } from '../store/hooks'
@@ -7,6 +8,7 @@ import { PageShell } from '../components/PageShell'
 import { TournamentPageHeader } from '../components/TournamentPageHeader'
 
 export function LeaderboardPage() {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const tournamentId = Number(id)
   const currentUser = useAppSelector((state) => state.auth.user)
@@ -18,7 +20,7 @@ export function LeaderboardPage() {
     return (
       <PageShell>
         <div className="flex h-48 items-center justify-center p-8 text-gray-500 dark:text-gray-400">
-          Loading tournament…
+          {t('leaderboard.loading')}
         </div>
       </PageShell>
     )
@@ -27,7 +29,7 @@ export function LeaderboardPage() {
   if (tError || !tournament) {
     return (
       <PageShell>
-        <div className="p-6 sm:p-8 text-red-500 dark:text-red-400">Tournament not found.</div>
+        <div className="p-6 sm:p-8 text-red-500 dark:text-red-400">{t('leaderboard.notFound')}</div>
       </PageShell>
     )
   }
@@ -45,20 +47,19 @@ export function LeaderboardPage() {
           currentUserId={currentUser?.id}
         />
 
-        {/* Leaderboard */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">Leaderboard</h2>
+          <h2 className="text-lg font-semibold mb-3">{t('leaderboard.title')}</h2>
 
           {lLoading && (
-            <p className="text-gray-500 dark:text-gray-400">Loading leaderboard…</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('leaderboard.loading2')}</p>
           )}
 
           {lError && (
-            <p className="text-red-500 dark:text-red-400">Failed to load leaderboard.</p>
+            <p className="text-red-500 dark:text-red-400">{t('leaderboard.failedToLoad')}</p>
           )}
 
           {!lLoading && !lError && (!leaderboard || leaderboard.length === 0) && (
-            <p className="text-gray-500 dark:text-gray-400">No scores yet.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('leaderboard.noScores')}</p>
           )}
 
           {leaderboard && leaderboard.length > 0 && (
@@ -84,7 +85,7 @@ export function LeaderboardPage() {
                       {canViewPredictions && <Search size={13} className="text-gray-400 flex-shrink-0" />}
                     </span>
                     <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tabular-nums">
-                      {entry.total_points} pts
+                      {t('common.pts', { count: entry.total_points })}
                     </span>
                   </button>
                 </li>

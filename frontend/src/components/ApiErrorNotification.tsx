@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { AlertTriangle, RefreshCw, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { dismissApiError } from '../store/apiErrorSlice'
 
 const AUTO_DISMISS_MS = 8000
 
 function ErrorToast({ id, message, status }: { id: string; message: string; status: number | string }) {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const dismiss = () => dispatch(dismissApiError(id))
 
@@ -23,21 +25,21 @@ function ErrorToast({ id, message, status }: { id: string; message: string; stat
       <AlertTriangle className="mt-0.5 size-4 shrink-0 text-red-400" aria-hidden="true" />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-red-200">
-          Request failed{typeof status === 'number' ? ` (${status})` : ''}
+          {t('error.requestFailed')}{typeof status === 'number' ? ` (${status})` : ''}
         </p>
         <p className="mt-0.5 text-xs text-red-300/80">{message}</p>
       </div>
       <button
         onClick={() => window.location.reload()}
         className="shrink-0 text-red-400 transition hover:text-red-200"
-        aria-label="Reload page"
+        aria-label={t('error.reloadPage')}
       >
         <RefreshCw className="size-4" />
       </button>
       <button
         onClick={dismiss}
         className="shrink-0 text-red-400 transition hover:text-red-200"
-        aria-label="Dismiss"
+        aria-label={t('error.dismiss')}
       >
         <X className="size-4" />
       </button>
