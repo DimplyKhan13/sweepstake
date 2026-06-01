@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        app: "url('/bg-stadium.webp')",
+        app: "url('/bg-stadium.png')",
       },
     },
   },
