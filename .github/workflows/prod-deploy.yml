@@ -5,13 +5,14 @@ on:
     types: [closed]
     branches: [main, master]
     paths-ignore: ['.github/**', 'docs/**', 'README.md']
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   autotag:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
