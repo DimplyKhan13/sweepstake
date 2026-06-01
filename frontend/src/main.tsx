@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
 import { store } from './store/store'
 import App from './App'
+import './i18n'
 import './index.css'
 
 ;(async () => {

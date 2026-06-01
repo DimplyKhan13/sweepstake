@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { UserPlus, Plus, LogOut, Settings } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useListTournamentsQuery } from '../api/tournamentApi'
 import { useLogoutMutation } from '../api/authApi'
 import { useGetConfigQuery } from '../api/configApi'
@@ -11,6 +12,7 @@ import { JoinTournamentModal } from '../modals/user'
 import { CreateTournamentModal } from '../modals/tournament'
 
 export function OverviewPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const inboundJoinCode = searchParams.get('join') ?? ''
@@ -42,8 +44,8 @@ export function OverviewPage() {
       <div className="p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">SweepStakes</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Select a SweepStake to get started.</p>
+            <h1 className="text-2xl font-bold">{t('overview.title')}</h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('overview.subtitle')}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
             {/* Row 1: account buttons */}
@@ -53,14 +55,14 @@ export function OverviewPage() {
                 className="rounded-full border border-gray-300 dark:border-gray-600 px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:text-gray-900 dark:hover:border-gray-400 dark:hover:text-gray-100 transition inline-flex items-center gap-1.5"
               >
                 <Settings size={15} />
-                <span className="hidden sm:inline">Settings</span>
+                <span className="hidden sm:inline">{t('overview.settings')}</span>
               </button>
               <button
                 onClick={handleLogout}
                 className="rounded-full border border-gray-300 dark:border-gray-600 px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-red-400 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-400 transition inline-flex items-center gap-1.5"
               >
                 <LogOut size={15} />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">{t('overview.logout')}</span>
               </button>
             </div>
             {/* Row 2: competition buttons */}
@@ -70,16 +72,16 @@ export function OverviewPage() {
                 className="rounded-full border border-gray-300 dark:border-gray-600 px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition inline-flex items-center justify-center gap-1.5"
               >
                 <UserPlus size={15} />
-                Join SweepStake
+                {t('overview.joinSweepStake')}
               </button>
-              <span title={!canCreate ? 'Only admins can create a SweepStake' : undefined}>
+              <span title={!canCreate ? t('overview.onlyAdminsCreate') : undefined}>
                 <button
                   onClick={() => canCreate && setShowCreate(true)}
                   disabled={!canCreate}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium transition inline-flex items-center justify-center gap-1.5 ${canCreate ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'}`}
                 >
                   <Plus size={15} />
-                  Create SweepStake
+                  {t('overview.createSweepStake')}
                 </button>
               </span>
             </div>
@@ -88,15 +90,15 @@ export function OverviewPage() {
 
         <div className="mt-6 space-y-3">
           {isLoading && (
-            <p className="text-gray-500 dark:text-gray-400">Loading tournaments…</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('overview.loading')}</p>
           )}
 
           {error && (
-            <p className="text-red-500 dark:text-red-400">Failed to load tournaments.</p>
+            <p className="text-red-500 dark:text-red-400">{t('overview.failedToLoad')}</p>
           )}
 
           {!isLoading && !error && tournaments?.length === 0 && (
-            <p className="text-gray-500 dark:text-gray-400">No tournaments found.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('overview.noTournaments')}</p>
           )}
 
           {[...(tournaments ?? [])]
@@ -129,7 +131,7 @@ export function OverviewPage() {
                   </div>
                   {adminNames && (
                     <span className="mt-0.5 block text-sm text-gray-500 dark:text-gray-400">
-                      by {adminNames}
+                      {t('overview.by', { name: adminNames })}
                     </span>
                   )}
                 </button>

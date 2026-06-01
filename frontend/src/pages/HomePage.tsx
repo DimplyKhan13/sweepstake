@@ -1,34 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Users, Wallet, Trophy, Target, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Footer } from '../components/Footer'
-
-const steps = [
-  {
-    icon: Users,
-    title: 'Create or join a competition',
-    description:
-      "Set up your own sweepstake and invite friends or colleagues with a single link — or jump straight into one they've already started. No complicated setup, no excuses.",
-  },
-  {
-    icon: Wallet,
-    title: 'Sort the stake',
-    description:
-      "If your group is playing for something, transfer your entry fee directly to whoever is holding the pot. Skin in the game makes every prediction matter just a little more.",
-  },
-  {
-    icon: Trophy,
-    title: 'Predict before the whistle',
-    description:
-      "Call the tournament winner, group standings, and knockout-stage outcomes before the relevant matches kick off. Once it starts, the books are closed.",
-  },
-  {
-    icon: Target,
-    title: 'Call every score, earn every point',
-    description:
-      "For each match, predict the exact scoreline before kick-off. Every correct call earns you points — and at the end, bragging rights are on the line.",
-  },
-]
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const SECTION_COUNT = 6   // hero + 4 steps + footer CTA
@@ -66,8 +40,11 @@ const base       = 'inline-block rounded px-6 py-3 text-sm font-semibold transit
 const primaryBtn = `${base} bg-teal-600 text-white hover:bg-teal-500 focus:ring-teal-500`
 const outlineBtn = `${base} border border-white/60 text-white hover:bg-white/10 focus:ring-white`
 
+const stepIcons = [Users, Wallet, Trophy, Target]
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function HomePage() {
+  const { t } = useTranslation()
   const { search } = useLocation()
   const containerRef = useRef<HTMLDivElement>(null)
   const heroRef      = useRef<HTMLDivElement>(null)
@@ -79,7 +56,13 @@ export function HomePage() {
   const nextCueRef     = useRef<HTMLDivElement>(null)
   const takepartCueRef = useRef<HTMLDivElement>(null)
 
-  // All animation state lives in a single mutable ref — no re-renders
+  const steps = [
+    { icon: stepIcons[0], title: t('home.steps.0.title'), description: t('home.steps.0.description') },
+    { icon: stepIcons[1], title: t('home.steps.1.title'), description: t('home.steps.1.description') },
+    { icon: stepIcons[2], title: t('home.steps.2.title'), description: t('home.steps.2.description') },
+    { icon: stepIcons[3], title: t('home.steps.3.title'), description: t('home.steps.3.description') },
+  ]
+
   const anim = useRef({ progress: 0, target: 0, animating: false, startProg: 0, startTime: 0 })
   const raf  = useRef(0)
   const wheelAccum = useRef(0)
@@ -87,29 +70,27 @@ export function HomePage() {
   useEffect(() => {
     const refs: Refs = [heroRef, step1Ref, step2Ref, step3Ref, step4Ref, ctaRef]
 
-    // Next Step cue: steps 1–3. Take part cue: step 4.
     function updateCue(p: number) {
       if (nextCueRef.current) {
         let op = 0
-        if      (p > 0 && p <= 1) op = p          // fading in with step 1
-        else if (p > 1 && p <= 3) op = 1          // fully visible through steps 2 & 3
-        else if (p > 3 && p <  4) op = 4 - p      // fading out as step 3 → step 4
+        if      (p > 0 && p <= 1) op = p
+        else if (p > 1 && p <= 3) op = 1
+        else if (p > 3 && p <  4) op = 4 - p
         nextCueRef.current.style.opacity       = String(op)
         nextCueRef.current.style.pointerEvents = op > 0.5 ? 'auto' : 'none'
       }
       if (takepartCueRef.current) {
         let op = 0
-        if      (p > 3 && p <= 4) op = p - 3      // fading in as step 4 arrives
-        else if (p > 4 && p <  5) op = 5 - p      // fading out as step 4 → CTA
+        if      (p > 3 && p <= 4) op = p - 3
+        else if (p > 4 && p <  5) op = 5 - p
         takepartCueRef.current.style.opacity       = String(op)
         takepartCueRef.current.style.pointerEvents = op > 0.5 ? 'auto' : 'none'
       }
     }
 
-    paint(refs, 0) // hero fully visible on mount
+    paint(refs, 0)
     updateCue(0)
 
-    // ── RAF animation loop ────────────────────────────────────────────────────
     function tick(now: number) {
       const s = anim.current
       const t = Math.min(1, (now - s.startTime) / ANIM_MS)
@@ -124,7 +105,7 @@ export function HomePage() {
         s.animating = false
         paint(refs, s.target)
         updateCue(s.target)
-        wheelAccum.current = 0 // ready for next gesture
+        wheelAccum.current = 0
       }
     }
 
@@ -141,16 +122,14 @@ export function HomePage() {
         s.animating = true
         raf.current = requestAnimationFrame(tick)
       }
-      // If already animating: updated target/startProg are picked up automatically
     }
 
     const goNext = () => goTo(anim.current.target + 1)
     const goPrev = () => goTo(anim.current.target - 1)
 
-    // ── Wheel ─────────────────────────────────────────────────────────────────
     function onWheel(e: WheelEvent) {
       e.preventDefault()
-      if (anim.current.animating) return // one snap per animation
+      if (anim.current.animating) return
       wheelAccum.current += e.deltaY
       if (Math.abs(wheelAccum.current) >= WHEEL_THRESH) {
         const dir = wheelAccum.current > 0 ? 1 : -1
@@ -159,7 +138,6 @@ export function HomePage() {
       }
     }
 
-    // ── Touch ─────────────────────────────────────────────────────────────────
     let touchY = 0
     const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0].clientY }
     const onTouchEnd   = (e: TouchEvent) => {
@@ -167,7 +145,6 @@ export function HomePage() {
       if (Math.abs(dy) > 40) { if (dy > 0) goNext(); else goPrev() }
     }
 
-    // ── Keyboard ──────────────────────────────────────────────────────────────
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); goNext() }
       if (e.key === 'ArrowUp'   || e.key === 'PageUp')   { e.preventDefault(); goPrev() }
@@ -204,16 +181,14 @@ export function HomePage() {
           Sweep<span className="text-teal-400">Stake</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
-          Think you know football better than your mates? Prove it. Predict match
-          scores and tournament winners, rack up points, and settle the debate
-          once and for all.
+          {t('home.tagline')}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link to={`/login${search}`} className={primaryBtn}>Sign in</Link>
-          <Link to={`/register${search}`} className={outlineBtn}>Create account</Link>
+          <Link to={`/login${search}`} className={primaryBtn}>{t('home.signIn')}</Link>
+          <Link to={`/register${search}`} className={outlineBtn}>{t('home.createAccount')}</Link>
         </div>
         <div className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40">
-          <span className="text-xs uppercase tracking-widest">How it works</span>
+          <span className="text-xs uppercase tracking-widest">{t('home.howItWorks')}</span>
           <ChevronDown className="animate-bounce" size={24} />
         </div>
       </div>
@@ -223,7 +198,7 @@ export function HomePage() {
         const { icon: Icon, title, description } = steps[i]
         return (
           <div
-            key={title}
+            key={i}
             ref={ref}
             className="absolute inset-0 flex items-center justify-center px-6"
             style={{ opacity: 0, pointerEvents: 'none', willChange: 'opacity, transform' }}
@@ -233,7 +208,7 @@ export function HomePage() {
                 <Icon size={40} />
               </div>
               <span className="mb-3 text-sm font-semibold uppercase tracking-widest text-teal-400">
-                Step {i + 1}
+                {t('home.step', { number: i + 1 })}
               </span>
               <h2 className="mb-5 text-4xl font-extrabold leading-tight sm:text-5xl">{title}</h2>
               <p className="max-w-lg text-lg leading-relaxed text-white/70">{description}</p>
@@ -242,23 +217,23 @@ export function HomePage() {
         )
       })}
 
-      {/* ── Next Step cue — shown for steps 1–3 ── */}
+      {/* ── Next Step cue ── */}
       <div
         ref={nextCueRef}
         className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 text-white/50"
         style={{ opacity: 0, pointerEvents: 'none' }}
       >
-        <span className="text-xs uppercase tracking-widest">Next Step</span>
+        <span className="text-xs uppercase tracking-widest">{t('home.nextStep')}</span>
         <ChevronDown className="animate-bounce" size={24} />
       </div>
 
-      {/* ── Take part cue — shown for step 4 ── */}
+      {/* ── Take part cue ── */}
       <div
         ref={takepartCueRef}
         className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 text-white/50"
         style={{ opacity: 0, pointerEvents: 'none' }}
       >
-        <span className="text-xs uppercase tracking-widest">Take part</span>
+        <span className="text-xs uppercase tracking-widest">{t('home.takePart')}</span>
         <ChevronDown className="animate-bounce" size={24} />
       </div>
 
@@ -269,14 +244,14 @@ export function HomePage() {
         style={{ opacity: 0, pointerEvents: 'none', willChange: 'opacity, transform' }}
       >
         <h2 className="text-3xl font-bold sm:text-5xl">
-          Ready to put your football<br className="hidden sm:block" /> knowledge to the test?
+          {t('home.ctaHeading')}
         </h2>
         <p className="mx-auto mt-5 max-w-md text-lg text-white/60">
-          All you need is an account and some confidence.
+          {t('home.ctaSubheading')}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link to={`/login${search}`} className={outlineBtn}>Sign in</Link>
-          <Link to={`/register${search}`} className={primaryBtn}>Create account</Link>
+          <Link to={`/login${search}`} className={outlineBtn}>{t('home.signIn')}</Link>
+          <Link to={`/register${search}`} className={primaryBtn}>{t('home.createAccount')}</Link>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
           <Footer />

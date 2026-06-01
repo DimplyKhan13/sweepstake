@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useRegisterMutation } from '../api/authApi'
 import { getApiErrorMessage } from '../api/apiError'
 
@@ -21,6 +22,7 @@ function GreenTick() {
 }
 
 export function RegisterForm() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { search } = useLocation()
   const [register, { isLoading, error }] = useRegisterMutation()
@@ -28,7 +30,6 @@ export function RegisterForm() {
   const [repeatEmail, setRepeatEmail] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
   const [repeatEmailFocused, setRepeatEmailFocused] = useState(false)
-  // const [repeatPasswordFocused, setRepeatPasswordFocused] = useState(false)
 
   const emailFilled = form.email.length > 0
   const emailMatch = emailFilled && form.email === repeatEmail
@@ -65,26 +66,23 @@ export function RegisterForm() {
       <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
         Sweep<span className="text-teal-500">Stake</span>
       </h1>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Create account</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('auth.createAccount')}</h2>
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{getApiErrorMessage(error, 'Registration failed')}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">{getApiErrorMessage(error, t('auth.registrationFailed'))}</p>
       )}
 
-      {/* First name */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">First name</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.firstName')}</label>
         <input name="first_name" type="text" required value={form.first_name} onChange={handleChange} className={inputClass} />
       </div>
 
-      {/* Last name */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Last name</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.lastName')}</label>
         <input name="last_name" type="text" value={form.last_name} onChange={handleChange} className={inputClass} />
       </div>
 
-      {/* Email */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.email')}</label>
         <div className="relative">
           <input
             name="email"
@@ -98,10 +96,9 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Repeat email — shown when email is filled but not yet matched */}
       {showRepeatEmail && (
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Repeat email</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.repeatEmail')}</label>
           <input
             name="repeatEmail"
             type="email"
@@ -115,9 +112,8 @@ export function RegisterForm() {
         </div>
       )}
 
-      {/* Password */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.password')}</label>
         <div className="relative">
           <input
             name="password"
@@ -131,10 +127,9 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Repeat password — shown when password is filled but not yet matched */}
       {showRepeatPassword && (
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Repeat password</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">{t('auth.repeatPassword')}</label>
           <input
             name="repeatPassword"
             type="password"
@@ -151,12 +146,12 @@ export function RegisterForm() {
         disabled={isLoading || !emailMatch || !passwordMatch}
         className="w-full rounded bg-teal-600 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 dark:bg-teal-500 dark:hover:bg-teal-600"
       >
-        {isLoading ? 'Creating account…' : 'Register'}
+        {isLoading ? t('auth.creatingAccount') : t('auth.register')}
       </button>
       <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-        Already have an account?{' '}
+        {t('auth.alreadyHaveAccount')}{' '}
         <Link to={`/login${search}`} className="text-teal-600 hover:underline dark:text-teal-400">
-          Sign in
+          {t('auth.signIn')}
         </Link>
       </p>
     </form>

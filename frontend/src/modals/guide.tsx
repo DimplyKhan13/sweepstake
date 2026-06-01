@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams, useLocation } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, X, Copy, Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useScrollLock } from './base'
 import { useGetTournamentQuery } from '../api/tournamentApi'
 import { StakeText } from '../components/TournamentPageHeader'
@@ -162,10 +163,11 @@ const ADMIN_EXTRA_PAGES: GuidePage[] = [
 // ---------------------------------------------------------------------------
 
 function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
+  const { t } = useTranslation()
   const { data: tournament } = useGetTournamentQuery(tournamentId!, { skip: tournamentId == null })
 
   if (!tournament) {
-    return <p className="text-sm text-gray-500 dark:text-gray-400">Loading scoring rules…</p>
+    return <p className="text-sm text-gray-500 dark:text-gray-400">{t('guide.loadingRules')}</p>
   }
 
   const rules: { label: string; points: number | null }[] = [
@@ -180,7 +182,7 @@ function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
 
   return (
     <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-      <p>These points are awarded for each correct prediction:</p>
+      <p>{t('guide.rulesDesc')}</p>
       <ul className="divide-y divide-gray-100 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {rules.map((r) => (
           <li key={r.label} className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800">
@@ -192,7 +194,7 @@ function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
         ))}
       </ul>
       {rules.length === 0 && (
-        <p className="text-gray-400 dark:text-gray-500 text-xs">No scoring rules configured yet.</p>
+        <p className="text-gray-400 dark:text-gray-500 text-xs">{t('guide.noRules')}</p>
       )}
     </div>
   )
@@ -203,13 +205,14 @@ function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
 // ---------------------------------------------------------------------------
 
 function StakePageBody({ stake }: { stake: string }) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-      <p>This SweepStake has an entry stake. Please make sure you pay it to be in:</p>
+      <p>{t('guide.stakeDesc')}</p>
       <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-4 py-3">
         <StakeText text={stake} />
       </div>
-      <p className="text-xs text-gray-400 dark:text-gray-500"><b>Note:</b> It might take a few days for the payment to be reflected in your account as the organiser has to manually tick a box.</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500">{t('guide.stakeNote')}</p>
     </div>
   )
 }
@@ -219,6 +222,7 @@ function StakePageBody({ stake }: { stake: string }) {
 // ---------------------------------------------------------------------------
 
 function InviteFriendsBody({ name, joinCode }: { name: string; joinCode: string }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   const base = window.location.origin
   const text =
@@ -236,7 +240,7 @@ function InviteFriendsBody({ name, joinCode }: { name: string; joinCode: string 
 
   return (
     <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-      <p>Share this message with friends to invite them:</p>
+      <p>{t('guide.shareDesc')}</p>
       <div className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 pr-16">
         <pre className="whitespace-pre-wrap text-xs text-gray-700 dark:text-gray-300 font-sans">{text}</pre>
         <button
@@ -245,7 +249,7 @@ function InviteFriendsBody({ name, joinCode }: { name: string; joinCode: string 
           className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
         >
           {copied ? <Check size={12} /> : <Copy size={12} />}
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? t('guide.copied') : t('guide.copy')}
         </button>
       </div>
     </div>
@@ -265,26 +269,27 @@ function GuideModalInner({
   tournamentId: number | null
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   useScrollLock()
   const { data: tournament } = useGetTournamentQuery(tournamentId!, { skip: tournamentId == null })
 
   const pages: GuidePage[] = [
     ...PARTICIPANT_PAGES.slice(0, -1),
     {
-      title: 'Competition Rules',
+      title: t('guide.competitionRules'),
       emoji: '📊',
       body: <ScoringRulesBody tournamentId={tournamentId} />,
     },
     PARTICIPANT_PAGES[PARTICIPANT_PAGES.length - 1],
     ...(tournament?.stake ? [{
-      title: 'Pay the Stake',
+      title: t('guide.payTheStake'),
       emoji: '💰',
       body: <StakePageBody stake={tournament.stake} />,
     }] : []),
     ...(variant === 'admin' ? [
       ...ADMIN_EXTRA_PAGES,
       ...(tournament?.join_code ? [{
-        title: 'Inviting Friends',
+        title: t('guide.invitingFriends'),
         emoji: '👥',
         body: <InviteFriendsBody name={tournament.name} joinCode={tournament.join_code} />,
       }] : []),
@@ -311,7 +316,7 @@ function GuideModalInner({
             type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition flex-shrink-0 ml-2"
-            aria-label="Close guide"
+            aria-label={t('guide.closeGuide')}
           >
             <X size={20} />
           </button>
@@ -331,7 +336,7 @@ function GuideModalInner({
                 key={i}
                 type="button"
                 onClick={() => setIndex(i)}
-                aria-label={`Go to page ${i + 1}`}
+                aria-label={t('guide.goToPage', { page: i + 1 })}
                 className={[
                   'rounded-full transition-all',
                   i === index
@@ -351,7 +356,7 @@ function GuideModalInner({
               className="inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               <ChevronLeft size={15} />
-              Back
+              {t('guide.back')}
             </button>
             {isLast ? (
               <button
@@ -359,7 +364,7 @@ function GuideModalInner({
                 onClick={onClose}
                 className="inline-flex items-center gap-1 rounded-full bg-blue-600 hover:bg-blue-700 px-4 py-1.5 text-sm font-medium text-white transition"
               >
-                Done
+                {t('guide.done')}
               </button>
             ) : (
               <button
@@ -367,7 +372,7 @@ function GuideModalInner({
                 onClick={() => setIndex((i) => Math.min(pages.length - 1, i + 1))}
                 className="inline-flex items-center gap-1 rounded-full bg-blue-600 hover:bg-blue-700 px-4 py-1.5 text-sm font-medium text-white transition"
               >
-                Next
+                {t('guide.next')}
                 <ChevronRight size={15} />
               </button>
             )}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CircleDollarSign, Crown, Loader2, UserX } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   useCreateTournamentMutation,
   useUpdateTournamentMutation,
@@ -46,14 +47,15 @@ type PointState = {
 }
 
 function PointFields(p: PointState & { disabled?: boolean }) {
+  const { t } = useTranslation()
   const fields = [
-    { label: '🥇 1st place points', value: p.firstPlacePoints, set: p.setFirstPlacePoints },
-    { label: '🥈 2nd place points', value: p.secondPlacePoints, set: p.setSecondPlacePoints },
-    { label: '🥉 3rd place points', value: p.thirdPlacePoints, set: p.setThirdPlacePoints },
-    { label: '⚽ Match winner points', value: p.matchWinnerPoints, set: p.setMatchWinnerPoints },
-    { label: '🎯 Exact score points', value: p.matchScorePoints, set: p.setMatchScorePoints },
-    { label: '👥 Group winner points', value: p.groupWinnerPoints, set: p.setGroupWinnerPoints },
-    { label: '🏆 Stage winner points', value: p.stageWinnerPoints, set: p.setStageWinnerPoints },
+    { label: t('createTournament.firstPlacePoints'), value: p.firstPlacePoints, set: p.setFirstPlacePoints },
+    { label: t('createTournament.secondPlacePoints'), value: p.secondPlacePoints, set: p.setSecondPlacePoints },
+    { label: t('createTournament.thirdPlacePoints'), value: p.thirdPlacePoints, set: p.setThirdPlacePoints },
+    { label: t('createTournament.matchWinnerPoints'), value: p.matchWinnerPoints, set: p.setMatchWinnerPoints },
+    { label: t('createTournament.exactScorePoints'), value: p.matchScorePoints, set: p.setMatchScorePoints },
+    { label: t('createTournament.groupWinnerPoints'), value: p.groupWinnerPoints, set: p.setGroupWinnerPoints },
+    { label: t('createTournament.stageWinnerPoints'), value: p.stageWinnerPoints, set: p.setStageWinnerPoints },
   ]
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -91,13 +93,14 @@ type EditPointAndTeamState = PointState & {
 }
 
 function EditPointAndTeamFields(p: EditPointAndTeamState) {
+  const { t } = useTranslation()
   const { data: teams = [], isLoading: teamsLoading } = useListTeamsQuery(p.tournamentId)
 
   const teamSelect = (value: string, set: (v: string) => void) =>
     teamsLoading ? (
       <div className={`${fieldClass} flex items-center gap-2 text-gray-400 dark:text-gray-500`}>
         <Loader2 className="animate-spin h-4 w-4 flex-shrink-0" />
-        <span className="text-sm">Loading teams…</span>
+        <span className="text-sm">{t('createTournament.loadingTeams')}</span>
       </div>
     ) : (
       <select
@@ -106,10 +109,10 @@ function EditPointAndTeamFields(p: EditPointAndTeamState) {
         disabled={p.disabled}
         className={fieldClass}
       >
-        <option value="">— none —</option>
-        {teams.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.name}
+        <option value="">{t('common.none')}</option>
+        {teams.map((team) => (
+          <option key={team.id} value={team.id}>
+            {team.name}
           </option>
         ))}
       </select>
@@ -130,43 +133,43 @@ function EditPointAndTeamFields(p: EditPointAndTeamState) {
   return (
     <div className="grid grid-cols-2 gap-3">
       <div>
-        <FieldLabel>🥇 1st place points</FieldLabel>
+        <FieldLabel>{t('createTournament.firstPlacePoints')}</FieldLabel>
         {numInput(p.firstPlacePoints, p.setFirstPlacePoints)}
       </div>
       <div>
-        <FieldLabel>🥇 1st place winner</FieldLabel>
+        <FieldLabel>{t('createTournament.firstPlaceWinner')}</FieldLabel>
         {teamSelect(p.firstPlaceTeamId, p.setFirstPlaceTeamId)}
       </div>
       <div>
-        <FieldLabel>🥈 2nd place points</FieldLabel>
+        <FieldLabel>{t('createTournament.secondPlacePoints')}</FieldLabel>
         {numInput(p.secondPlacePoints, p.setSecondPlacePoints)}
       </div>
       <div>
-        <FieldLabel>🥈 2nd place winner</FieldLabel>
+        <FieldLabel>{t('createTournament.secondPlaceWinner')}</FieldLabel>
         {teamSelect(p.secondPlaceTeamId, p.setSecondPlaceTeamId)}
       </div>
       <div>
-        <FieldLabel>🥉 3rd place points</FieldLabel>
+        <FieldLabel>{t('createTournament.thirdPlacePoints')}</FieldLabel>
         {numInput(p.thirdPlacePoints, p.setThirdPlacePoints)}
       </div>
       <div>
-        <FieldLabel>🥉 3rd place winner</FieldLabel>
+        <FieldLabel>{t('createTournament.thirdPlaceWinner')}</FieldLabel>
         {teamSelect(p.thirdPlaceTeamId, p.setThirdPlaceTeamId)}
       </div>
       <div>
-        <FieldLabel>🏆 Stage winner points</FieldLabel>
+        <FieldLabel>{t('createTournament.stageWinnerPoints')}</FieldLabel>
         {numInput(p.stageWinnerPoints, p.setStageWinnerPoints)}
       </div>
       <div>
-        <FieldLabel>👥 Group winner points</FieldLabel>
+        <FieldLabel>{t('createTournament.groupWinnerPoints')}</FieldLabel>
         {numInput(p.groupWinnerPoints, p.setGroupWinnerPoints)}
       </div>
       <div>
-        <FieldLabel>🎯 Exact score points</FieldLabel>
+        <FieldLabel>{t('createTournament.exactScorePoints')}</FieldLabel>
         {numInput(p.matchScorePoints, p.setMatchScorePoints)}
       </div>
       <div>
-        <FieldLabel>⚽ Match winner points</FieldLabel>
+        <FieldLabel>{t('createTournament.matchWinnerPoints')}</FieldLabel>
         {numInput(p.matchWinnerPoints, p.setMatchWinnerPoints)}
       </div>
     </div>
@@ -196,11 +199,12 @@ function TournamentInfoFields({
   autoFocusName?: boolean
   disabled?: boolean
 }) {
+  const { t } = useTranslation()
   const { data: fdoTournaments, isLoading: fdoLoading } = useListFootballDataOrgTournamentsQuery()
   return (
     <>
       <div>
-        <FieldLabel>Name</FieldLabel>
+        <FieldLabel>{t('createTournament.name')}</FieldLabel>
         <input
           autoFocus={autoFocusName}
           value={name}
@@ -210,22 +214,22 @@ function TournamentInfoFields({
         />
       </div>
       <div>
-        <FieldLabel>Stake / Prize <i>(empty if no entry stake)</i></FieldLabel>
+        <FieldLabel>{t('createTournament.stakePrize')} <i>({t('createTournament.stakeEmpty')})</i></FieldLabel>
         <textarea
           value={stake}
           onChange={(e) => setStake(e.target.value)}
           rows={3}
-          placeholder="Describe the stake or prize… URLs will be auto-linked."
+          placeholder={t('createTournament.stakePlaceholder')}
           disabled={disabled}
           className={`${fieldClass} resize-y`}
         />
       </div>
       <div>
-        <FieldLabel>Football-data.org tournament <i>(recommended)</i></FieldLabel>
+        <FieldLabel>{t('createTournament.fdoTournament')} <i>({t('createTournament.fdoRecommended')})</i></FieldLabel>
         {fdoLoading ? (
           <div className={`${fieldClass} flex items-center gap-2 text-gray-400 dark:text-gray-500`}>
             <Loader2 className="animate-spin h-4 w-4 flex-shrink-0" />
-            <span className="text-sm">Loading tournaments…</span>
+            <span className="text-sm">{t('createTournament.loadingTournaments')}</span>
           </div>
         ) : (
           <select
@@ -234,7 +238,7 @@ function TournamentInfoFields({
             disabled={disabled}
             className={fieldClass}
           >
-            <option value="">— none —</option>
+            <option value="">{t('common.none')}</option>
             {fdoTournaments?.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.name}
@@ -252,6 +256,7 @@ function TournamentInfoFields({
 // ---------------------------------------------------------------------------
 
 export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [createTournament, { isLoading }] = useCreateTournamentMutation()
 
@@ -286,12 +291,12 @@ export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
       onClose()
       navigate(`/tournament/${tournament.id}?guide=admin`)
     } catch {
-      setError('Failed to create tournament. Please try again.')
+      setError(t('createTournament.failedCreate'))
     }
   }
 
   return (
-    <ModalShell title="Create Tournament" onClose={onClose}>
+    <ModalShell title={t('createTournament.title')} onClose={onClose}>
       <ModalBody scrollable>
         <TournamentInfoFields
           name={name}
@@ -323,9 +328,9 @@ export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
         <ErrorMsg msg={error} />
       </ModalBody>
       <ModalFooter>
-        <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+        <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
         <BtnPrimary onClick={handleCreate} disabled={isLoading || !name.trim()} loading={isLoading}>
-          {isLoading ? 'Creating…' : 'Create'}
+          {isLoading ? t('common.creating') : t('common.create')}
         </BtnPrimary>
       </ModalFooter>
     </ModalShell>
@@ -343,6 +348,7 @@ export function EditTournamentModal({
   tournament: Tournament
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { data: me } = useGetMeQuery()
   const [updateTournament, { isLoading: isSaving }] = useUpdateTournamentMutation()
@@ -397,7 +403,7 @@ export function EditTournamentModal({
         data: { user_id: userId, stake_paid: !isCurrentlyPaid },
       }).unwrap()
     } catch {
-      setMemberError('Failed to update stake payment status.')
+      setMemberError(t('createTournament.failedStakePaid'))
     }
   }
 
@@ -405,9 +411,7 @@ export function EditTournamentModal({
     if (
       isCurrentlyAdmin &&
       userId === me?.id &&
-      !window.confirm(
-        'Remove yourself as admin? If you are the last admin the tournament will be permanently deleted.',
-      )
+      !window.confirm(t('createTournament.removeAdminConfirm'))
     )
       return
     setMemberError(null)
@@ -417,7 +421,7 @@ export function EditTournamentModal({
         data: { user_id: userId, role: 'admin', action: isCurrentlyAdmin ? 'remove' : 'add' },
       }).unwrap()
     } catch {
-      setMemberError('Failed to update admin status.')
+      setMemberError(t('createTournament.failedAdmin'))
     }
   }
 
@@ -426,8 +430,8 @@ export function EditTournamentModal({
     const displayName =
       tournament.participant_lst.find((p) => p.id === userId)?.user_name ?? `User #${userId}`
     const message = isSelf
-      ? 'Remove yourself from this tournament? This cannot be undone.'
-      : `Remove "${displayName}" from this tournament? This cannot be undone.`
+      ? t('createTournament.removeSelfConfirm')
+      : t('createTournament.removeUserConfirm', { name: displayName })
     if (!window.confirm(message)) return
     setMemberError(null)
     try {
@@ -446,15 +450,13 @@ export function EditTournamentModal({
         navigate('/overview')
       }
     } catch {
-      setMemberError('Failed to remove participant.')
+      setMemberError(t('createTournament.failedRemove'))
     }
   }
 
   async function handleDelete() {
     if (
-      !window.confirm(
-        `Delete "${tournament.name}"? This cannot be undone. All user predictions will also be unrecoverably deleted.`,
-      )
+      !window.confirm(t('createTournament.deleteConfirm', { name: tournament.name }))
     )
       return
     setError(null)
@@ -463,7 +465,7 @@ export function EditTournamentModal({
       onClose()
       navigate('/overview')
     } catch {
-      setError('Failed to delete tournament. Please try again.')
+      setError(t('createTournament.failedDelete'))
     }
   }
 
@@ -490,12 +492,12 @@ export function EditTournamentModal({
       }).unwrap()
       onClose()
     } catch {
-      setError('Failed to save changes. Please try again.')
+      setError(t('createTournament.failedSave'))
     }
   }
 
   return (
-    <ModalShell title="Edit Tournament" onClose={onClose}>
+    <ModalShell title={t('createTournament.editTitle')} onClose={onClose}>
       <ModalBody scrollable>
         <TournamentInfoFields
           name={name}
@@ -531,7 +533,7 @@ export function EditTournamentModal({
           disabled={isLoading}
         />
         <div>
-          <FieldLabel>Participants</FieldLabel>
+          <FieldLabel>{t('createTournament.participants')}</FieldLabel>
           <ul className="space-y-1">
             {tournament.participant_lst.map((p) => {
               const participantIsAdmin = tournament.admin_lst.some((a) => a.id === p.id)
@@ -545,14 +547,14 @@ export function EditTournamentModal({
                   </span>
                   {participantIsAdmin && (
                     <span className="flex-shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/60 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">
-                      admin
+                      {t('createTournament.adminBadge')}
                     </span>
                   )}
                   {tournament.stake && (
                     <button
                       type="button"
                       onClick={() => handleToggleStakePaid(p.id, p.stake_paid)}
-                      title={p.stake_paid ? 'Mark stake as unpaid' : 'Mark stake as paid'}
+                      title={p.stake_paid ? t('createTournament.markStakeUnpaid') : t('createTournament.markStakePaid')}
                       className={[
                         'flex-shrink-0 p-1 rounded transition',
                         p.stake_paid
@@ -566,7 +568,7 @@ export function EditTournamentModal({
                   <button
                     type="button"
                     onClick={() => handleToggleAdmin(p.id, participantIsAdmin)}
-                    title={participantIsAdmin ? 'Demote from admin' : 'Promote to admin'}
+                    title={participantIsAdmin ? t('createTournament.demoteAdmin') : t('createTournament.promoteAdmin')}
                     className={[
                       'flex-shrink-0 p-1 rounded transition',
                       participantIsAdmin
@@ -579,7 +581,7 @@ export function EditTournamentModal({
                   <button
                     type="button"
                     onClick={() => handleRemoveParticipant(p.id, participantIsAdmin)}
-                    title="Remove from competition"
+                    title={t('createTournament.removeCompetition')}
                     className="flex-shrink-0 p-1 rounded text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition"
                   >
                     <UserX size={14} />
@@ -588,19 +590,19 @@ export function EditTournamentModal({
               )
             })}
           </ul>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3"><b>Note:</b> 💲 user paid stake; 👑 promote to admin; ❌ remove from competition.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">{t('createTournament.noteParticipants')}</p>
           <ErrorMsg msg={memberError} />
         </div>
         <ErrorMsg msg={error} />
       </ModalBody>
       <ModalFooter justify="between">
         <BtnDanger onClick={handleDelete} disabled={isLoading} loading={isDeleting}>
-          {isDeleting ? 'Deleting…' : 'Delete'}
+          {isDeleting ? t('common.deleting') : t('common.delete')}
         </BtnDanger>
         <div className="flex gap-2">
-          <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+          <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
           <BtnPrimary onClick={handleSave} disabled={isLoading} loading={isSaving}>
-            {isSaving ? 'Saving…' : 'Save'}
+            {isSaving ? t('common.saving') : t('common.save')}
           </BtnPrimary>
         </div>
       </ModalFooter>

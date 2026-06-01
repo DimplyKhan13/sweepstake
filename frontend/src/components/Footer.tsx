@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ModalShell, ModalBody } from '../modals/base'
 import { useGetConfigQuery } from '../api/configApi'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 type ModalType = 'credits' | 'privacy' | null
 
 export function Footer() {
+  const { t } = useTranslation()
   const [open, setOpen] = useState<ModalType>(null)
   const { data: config } = useGetConfigQuery()
 
@@ -16,14 +19,14 @@ export function Footer() {
           onClick={() => setOpen('credits')}
           className="hover:text-white transition-colors"
         >
-          Credits
+          {t('footer.credits')}
         </button>
         <button
           type="button"
           onClick={() => setOpen('privacy')}
           className="hover:text-white transition-colors"
         >
-          Your Data
+          {t('footer.yourData')}
         </button>
         <a
           href="https://github.com/vanalmsick/sweepstake"
@@ -31,17 +34,19 @@ export function Footer() {
           rel="noopener"
           className="hover:text-white transition-colors"
         >
-          Open Source Project
+          {t('footer.openSource')}
         </a>
+        <LanguageSwitcher />
       </footer>
 
       {open === 'credits' && (
-        <ModalShell title="Credits" onClose={() => setOpen(null)}>
+        <ModalShell title={t('footer.credits')} onClose={() => setOpen(null)}>
           <ModalBody>
             <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 list-disc list-inside">
               <li>
-                This is an Open Source project under the{' '}
-                <strong>SSPL v1.0 license</strong> on{' '}
+                {t('footer.creditsLicense')}{' '}
+                <strong>SSPL v1.0</strong>{' '}
+                on{' '}
                 <a
                   href="https://github.com/vanalmsick/sweepstake"
                   target="_blank"
@@ -53,7 +58,7 @@ export function Footer() {
                 .
               </li>
               <li>
-                Background image free to use from{' '}
+                {t('footer.creditsBackground')}{' '}
                 <a
                   href="https://unsplash.com/photos/soccer-field-qCrKTET_09o"
                   target="_blank"
@@ -65,7 +70,7 @@ export function Footer() {
                 .
               </li>
               <li>
-                Logo free to use from{' '}
+                {t('footer.creditsLogo')}{' '}
                 <a
                   href="https://www.svgrepo.com/svg/390331/football-ball-soccer"
                   target="_blank"
@@ -76,9 +81,9 @@ export function Footer() {
                 </a>
                 .
               </li>
-              <li>Team images from football-data.org.</li>
+              <li>{t('footer.creditsTeamImages')}</li>
               <li>
-                Tailwind CSS design elements with icons from{' '}
+                {t('footer.creditsTailwind')}{' '}
                 <a
                   href="https://lucide.dev"
                   target="_blank"
@@ -87,7 +92,7 @@ export function Footer() {
                 >
                   Lucide
                 </a>{' '}
-                for React.
+                {t('footer.creditsForReact')}
               </li>
             </ul>
           </ModalBody>
@@ -96,16 +101,13 @@ export function Footer() {
 
       {open === 'privacy' && (
         <ModalShell
-          title="Your Data"
+          title={t('footer.yourData')}
           onClose={() => setOpen(null)}
           maxWidth="max-w-lg"
         >
           <ModalBody>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              No data is sold or shared with anyone. If you delete your account,
-              all your data is unrecoverably deleted. There may be backups
-              containing your user data for a few more weeks until the retention
-              period is exceeded.
+              {t('footer.privacyNoSell')}
             </p>
             {config?.sentry_dsn && (
               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -117,18 +119,11 @@ export function Footer() {
                 >
                   Sentry.io
                 </a>{' '}
-                error and performance monitoring is enabled. In line with EU GDPR,
-                errors are reported anonymised (no personally identifiable
-                information) to the administrator, along with basic performance
-                statistics (e.g. loading speed) for approximately 25&nbsp;% of
-                sessions to detect malfunctions. Please see Sentry.io's data
-                privacy policy for details.
+                {t('footer.privacySentry')}
               </p>
             )}
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              No user statistics or other analytics are collected by the website
-              itself. The data you see when using the app is the data that is
-              saved — for example your personal profile, predictions, and points.
+              {t('footer.privacyNoAnalytics')}
             </p>
           </ModalBody>
         </ModalShell>

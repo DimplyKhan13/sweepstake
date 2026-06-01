@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useUpdateMeMutation, useChangePasswordMutation, useDeleteMeMutation } from '../api/authApi'
 import { useJoinTournamentMutation } from '../api/tournamentApi'
 import { useAppSelector } from '../store/hooks'
@@ -22,6 +23,7 @@ const fieldErrorClass =
 
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation()
   const user = useAppSelector((state) => state.auth.user)
   const [updateMe, { isLoading: isSaving }] = useUpdateMeMutation()
   const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation()
@@ -54,17 +56,13 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
   const canSave = emailConfirmed && newPasswordConfirmed && (!newPasswordFilled || currentPassword.length > 0)
 
   async function handleDeleteAccount() {
-    const confirmed = window.confirm(
-      'Are you sure you want to permanently delete your account?\n\n' +
-      'This will delete all your predictions and any competition where you are the last admin. ' +
-      'This action cannot be undone.'
-    )
+    const confirmed = window.confirm(t('user.deleteAccountConfirm'))
     if (!confirmed) return
     try {
       await deleteMe().unwrap()
       onClose()
     } catch {
-      setError('Failed to delete account. Please try again.')
+      setError(t('user.failedDelete'))
     }
   }
 
@@ -84,16 +82,16 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
       }
       onClose()
     } catch {
-      setError('Failed to save changes. Please try again.')
+      setError(t('user.failedSave'))
     }
   }
 
   return (
-    <ModalShell title="Profile Settings" onClose={onClose}>
+    <ModalShell title={t('user.profileSettings')} onClose={onClose}>
       <ModalBody>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <FieldLabel>First name</FieldLabel>
+            <FieldLabel>{t('user.firstName')}</FieldLabel>
             <input
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -102,7 +100,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             />
           </div>
           <div>
-            <FieldLabel>Last name</FieldLabel>
+            <FieldLabel>{t('user.lastName')}</FieldLabel>
             <input
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -112,7 +110,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div>
-          <FieldLabel>Username</FieldLabel>
+          <FieldLabel>{t('user.username')}</FieldLabel>
           <input
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
@@ -121,7 +119,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           />
         </div>
         <div>
-          <FieldLabel>Email</FieldLabel>
+          <FieldLabel>{t('user.email')}</FieldLabel>
           <div className="relative">
             <input
               type="email"
@@ -137,7 +135,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </div>
         {showRepeatEmail && (
           <div>
-            <FieldLabel>Repeat new email</FieldLabel>
+            <FieldLabel>{t('user.repeatNewEmail')}</FieldLabel>
             <input
               type="email"
               value={repeatEmail}
@@ -148,24 +146,24 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
         <div>
-          <FieldLabel>Gender</FieldLabel>
+          <FieldLabel>{t('user.gender')}</FieldLabel>
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value as Gender | '')}
             disabled={isLoading}
             className={fieldClass}
           >
-            <option value="">— not specified —</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="">{t('user.genderNotSpecified')}</option>
+            <option value="male">{t('user.genderMale')}</option>
+            <option value="female">{t('user.genderFemale')}</option>
+            <option value="other">{t('user.genderOther')}</option>
           </select>
         </div>
         <hr className="border-gray-200 dark:border-gray-700" />
 
         {/* New password */}
         <div>
-          <FieldLabel>New password</FieldLabel>
+          <FieldLabel>{t('user.newPassword')}</FieldLabel>
           <div className="relative">
             <input
               type="password"
@@ -182,7 +180,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
         {showRepeatPassword && (
           <div>
-            <FieldLabel>Repeat new password</FieldLabel>
+            <FieldLabel>{t('user.repeatNewPassword')}</FieldLabel>
             <input
               type="password"
               value={repeatNewPassword}
@@ -195,7 +193,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
         {newPasswordFilled && (
           <div>
-            <FieldLabel>Current password</FieldLabel>
+            <FieldLabel>{t('user.currentPassword')}</FieldLabel>
             <input
               type="password"
               value={currentPassword}
@@ -210,12 +208,12 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
       </ModalBody>
       <ModalFooter justify="between">
         <BtnDanger onClick={handleDeleteAccount} disabled={isLoading} loading={isDeleting}>
-          Delete Account
+          {t('user.deleteAccount')}
         </BtnDanger>
         <div className="flex items-center gap-2">
-          <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+          <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
           <BtnPrimary onClick={handleSave} disabled={isLoading || !canSave} loading={isSaving || isChangingPassword}>
-            {isSaving || isChangingPassword ? 'Saving…' : 'Save'}
+            {isSaving || isChangingPassword ? t('common.saving') : t('common.save')}
           </BtnPrimary>
         </div>
       </ModalFooter>
@@ -224,6 +222,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 }
 
 export function JoinTournamentModal({ onClose, initialCode }: { onClose: () => void; initialCode?: string }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [joinTournament, { isLoading }] = useJoinTournamentMutation()
   const [joinCode, setJoinCode] = useState(initialCode ?? '')
@@ -232,9 +231,9 @@ export function JoinTournamentModal({ onClose, initialCode }: { onClose: () => v
   const JOIN_CODE_RE = /^[A-Za-z]{0,8}\d{8,}$/
 
   function validateJoinCode(code: string): string | null {
-    if (!code) return 'Please enter a join code.'
-    if (code.length > 16) return 'Join code must be 16 characters or fewer.'
-    if (!JOIN_CODE_RE.test(code)) return 'Join code must be 0–8 letters followed by at least 8 digits, with no spaces or special characters.'
+    if (!code) return t('user.invalidJoinCode')
+    if (code.length > 16) return t('user.joinCodeTooLong')
+    if (!JOIN_CODE_RE.test(code)) return t('user.joinCodeInvalid')
     return null
   }
 
@@ -248,21 +247,21 @@ export function JoinTournamentModal({ onClose, initialCode }: { onClose: () => v
       onClose()
       navigate(`/tournament/${tournament.id}?guide=participant`)
     } catch {
-      setError('Invalid join code or you are already a member.')
+      setError(t('user.joinFailed'))
     }
   }
 
   return (
-    <ModalShell title="Join Competition" onClose={onClose} maxWidth="max-w-sm">
+    <ModalShell title={t('user.joinCompetition')} onClose={onClose} maxWidth="max-w-sm">
       <ModalBody>
         <div>
-          <FieldLabel>Join code</FieldLabel>
+          <FieldLabel>{t('user.joinCode')}</FieldLabel>
           <input
             autoFocus
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            placeholder="Enter join code…"
+            placeholder={t('user.joinCodePlaceholder')}
             disabled={isLoading}
             className={fieldClass}
           />
@@ -273,9 +272,9 @@ export function JoinTournamentModal({ onClose, initialCode }: { onClose: () => v
         <ErrorMsg msg={error} />
       </ModalBody>
       <ModalFooter>
-        <BtnSecondary onClick={onClose}>Cancel</BtnSecondary>
+        <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
         <BtnPrimary onClick={handleJoin} disabled={isLoading || !!validateJoinCode(joinCode.trim())} loading={isLoading}>
-          {isLoading ? 'Joining…' : 'Join'}
+          {isLoading ? t('common.joining') : t('common.join')}
         </BtnPrimary>
       </ModalFooter>
     </ModalShell>
