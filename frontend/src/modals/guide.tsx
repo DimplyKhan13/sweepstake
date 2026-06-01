@@ -171,13 +171,13 @@ function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
   }
 
   const rules: { label: string; points: number | null }[] = [
-    { label: '🥇 Correct tournament winner', points: tournament.first_place_points },
-    { label: '🥈 Correct runner-up', points: tournament.second_place_points },
-    { label: '🥉 Correct third place', points: tournament.third_place_points },
-    { label: '👥 Correct group winner', points: tournament.group_winner_points },
-    { label: '🏆 Correct stage winner', points: tournament.stage_winner_points },
-    { label: '⚽ Correct match winner', points: tournament.match_winner_points },
-    { label: '🎯 Exact match score', points: tournament.match_score_points },
+    { label: t('scoringRule.correctTournamentWinner'), points: tournament.first_place_points },
+    { label: t('scoringRule.correctRunnerUp'), points: tournament.second_place_points },
+    { label: t('scoringRule.correctThirdPlace'), points: tournament.third_place_points },
+    { label: t('scoringRule.correctGroupWinner'), points: tournament.group_winner_points },
+    { label: t('scoringRule.correctStageWinner'), points: tournament.stage_winner_points },
+    { label: t('scoringRule.correctMatchWinner'), points: tournament.match_winner_points },
+    { label: t('scoringRule.exactMatchScore'), points: tournament.match_score_points },
   ].filter((r) => r.points != null && r.points !== 0)
 
   return (

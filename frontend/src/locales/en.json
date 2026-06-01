@@ -339,6 +339,15 @@
     "editingMatchesTitle": "Editing Matches",
     "othersPredictionsTitle": "Others' Predictions"
   },
+  "scoringRule": {
+    "correctTournamentWinner": "🥇 Correct tournament winner",
+    "correctRunnerUp": "🥈 Correct runner-up",
+    "correctThirdPlace": "🥉 Correct third place",
+    "correctGroupWinner": "👥 Correct group winner",
+    "correctStageWinner": "🏆 Correct stage winner",
+    "correctMatchWinner": "⚽ Correct match winner",
+    "exactMatchScore": "🎯 Exact match score"
+  },
   "language": {
     "label": "Language",
     "en": "English",

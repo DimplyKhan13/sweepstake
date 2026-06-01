@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { useParams, Navigate, useSearchParams } from 'react-router-dom'
 import { Dices, Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { GroupStatsModal, StageStatsModal, TournamentStatsModal } from '../modals/winnerStats'
 import { useGetTournamentQuery } from '../api/tournamentApi'
 import { useListMatchesQuery } from '../api/matchApi'
@@ -88,7 +89,8 @@ function TeamSelect({
   onStatsClick?: () => void
   featured?: boolean
 }) {
-  const selectedTeam = teams.find((t) => t.id === currentTeamId)
+  const { t } = useTranslation()
+  const selectedTeam = teams.find((team) => team.id === currentTeamId)
 
   const daysLeft = (() => {
     if (!isOwn || disabled || !startDate) return null
@@ -113,14 +115,14 @@ function TeamSelect({
               </span>
             )}
             {isOwn && disabled && currentTeamId != null && pointsEarned == null && (
-              <span className="text-xs italic text-amber-600/70 dark:text-amber-400/60">🤞 fingers crossed</span>
+              <span className="text-xs italic text-amber-600/70 dark:text-amber-400/60">{t('predictions.fingersCrossed')}</span>
             )}
             {isOwn && disabled && currentTeamId == null && pointsEarned == null && (
-              <span className="text-xs italic text-gray-400 dark:text-gray-500"><span className="text-[0.8em]">❌</span> missed cutoff</span>
+              <span className="text-xs italic text-gray-400 dark:text-gray-500"><span className="text-[0.8em]">❌</span> {t('predictions.missedCutoff')}</span>
             )}
             {isOwn && !disabled && pointsEarned == null && daysLeft != null && (
               <span className="text-xs italic text-amber-600/70 dark:text-amber-400/60">
-                {daysLeft === 1 ? '1 day left' : `${daysLeft} days left`}
+                {t('predictions.daysLeft', { count: daysLeft })}
               </span>
             )}
             {onStatsClick && (
@@ -145,7 +147,7 @@ function TeamSelect({
           <div className="flex-1 min-w-0">
             {!isOwn || disabled ? (
               <p className="text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                {selectedTeam?.name ?? <span className="text-gray-400 dark:text-gray-500 font-normal text-base italic">No pick yet</span>}
+                {selectedTeam?.name ?? <span className="text-gray-400 dark:text-gray-500 font-normal text-base italic">{t('predictions.noPickYet')}</span>}
               </p>
             ) : (
               <>
@@ -158,7 +160,7 @@ function TeamSelect({
                   onClick={(e) => e.stopPropagation()}
                   className="w-full rounded-xl border border-amber-300 dark:border-amber-700 bg-white/80 dark:bg-gray-800/80 text-sm text-gray-900 dark:text-gray-100 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 >
-                  <option value="">— pick a team —</option>
+                  <option value="">{t('predictions.pickATeam')}</option>
                   {teams.map((t) => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
@@ -219,14 +221,14 @@ function TeamSelect({
             </span>
           )}
           {isOwn && disabled && currentTeamId != null && pointsEarned == null && (
-            <span className="text-xs italic text-gray-400 dark:text-gray-500">🤞 fingers crossed</span>
+            <span className="text-xs italic text-gray-400 dark:text-gray-500">{t('predictions.fingersCrossed')}</span>
           )}
           {isOwn && disabled && currentTeamId == null && pointsEarned == null && (
-            <span className="text-xs italic text-gray-400 dark:text-gray-500"><span className="text-[0.8em]">❌</span> missed cutoff</span>
+            <span className="text-xs italic text-gray-400 dark:text-gray-500"><span className="text-[0.8em]">❌</span> {t('predictions.missedCutoff')}</span>
           )}
           {isActive && pointsEarned == null && daysLeft != null && (
             <span className="text-xs italic text-gray-400 dark:text-gray-500">
-              {daysLeft === 1 ? '1 day left' : `${daysLeft} days left`}
+              {t('predictions.daysLeft', { count: daysLeft })}
             </span>
           )}
           {onStatsClick && (
@@ -247,7 +249,7 @@ function TeamSelect({
             )}
             <div className="flex-1 min-w-0">
               <p className={`text-sm font-medium truncate ${selectedTeam ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 italic'}`}>
-                {selectedTeam?.name ?? 'No pick'}
+                {selectedTeam?.name ?? t('predictions.noPick')}
               </p>
             </div>
           </div>
@@ -359,6 +361,7 @@ function ScoreInput({
 }
 
 export function PredictionsPage() {
+  const { t } = useTranslation()
   const { id, userId } = useParams<{ id: string; userId: string }>()
   const tournamentId = Number(id)
   const isMy = userId === 'my'
@@ -498,7 +501,7 @@ export function PredictionsPage() {
     return (
       <PageShell>
         <div className="flex h-48 items-center justify-center p-8 text-gray-500 dark:text-gray-400">
-          Loading tournament…
+          {t('predictions.loading')}
         </div>
       </PageShell>
     )
@@ -507,7 +510,7 @@ export function PredictionsPage() {
   if (tError || !tournament) {
     return (
       <PageShell>
-        <div className="p-6 sm:p-8 text-red-500 dark:text-red-400">Tournament not found.</div>
+        <div className="p-6 sm:p-8 text-red-500 dark:text-red-400">{t('predictions.notFound')}</div>
       </PageShell>
     )
   }
@@ -589,9 +592,9 @@ export function PredictionsPage() {
         {/* Tournament winner */}
         {showTournamentSection && (
           <section>
-            <h2 className="text-lg font-semibold mb-3">🏆 Tournament Winner</h2>
+            <h2 className="text-lg font-semibold mb-3">{t('predictions.tournamentWinner')}</h2>
             <TeamSelect
-              label="Who will win the tournament?"
+              label={t('predictions.whoWillWin')}
               featured
               teams={teams}
               currentTeamId={tournamentWinnerTeamId}
@@ -622,9 +625,9 @@ export function PredictionsPage() {
         {/* Stage winners */}
         {visibleStages.length > 0 && !!tournament.stage_winner_points && (
           <section>
-            <h2 className="text-lg font-semibold mb-3">🏅 Stage Winners
+            <h2 className="text-lg font-semibold mb-3">{t('predictions.stageWinners')}
               <span className="ml-2 text-xs font-normal text-gray-400 dark:text-gray-500 normal-case tracking-normal">
-                +{tournament.stage_winner_points} pts each
+                {t('predictions.ptsEachLabel', { count: tournament.stage_winner_points })}
               </span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -662,7 +665,7 @@ export function PredictionsPage() {
         {/* Group winners */}
         {visibleGroups.length > 0 && !!tournament.group_winner_points && (
           <section>
-            <h2 className="text-lg font-semibold mb-3">🥇 Group Winners</h2>
+            <h2 className="text-lg font-semibold mb-3">{t('predictions.groupWinners')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {visibleGroups.map((group) => {
                 const groupTeams = teams.filter((t) => t.group_id === group.id)
@@ -671,7 +674,7 @@ export function PredictionsPage() {
                 return (
                   <TeamSelect
                     key={group.id}
-                    label={group.name.toLowerCase().includes('group') ? `${group.name}` : `Group ${group.name}`}
+                    label={/group|grupo/i.test(group.name) ? group.name : t('tournament.group', { name: group.name })}
                     teams={groupTeams.length > 0 ? groupTeams : teams}
                     currentTeamId={groupPredMap.get(group.id)?.winner_team_id ?? null}
                     isOwn={isEditable}
@@ -701,7 +704,7 @@ export function PredictionsPage() {
           <section>
             <div className="flex items-center justify-between gap-4 mb-3">
               <h2 className="text-lg font-semibold">
-                ⚽ Match Predictions
+                {t('predictions.matchPredictions')}
               </h2>
               {isViewingOwn && (
                 <button
@@ -711,17 +714,17 @@ export function PredictionsPage() {
                 >
                   <Dices size={13} className={isGeneratingRandom ? 'animate-spin' : ''} />
                   <span className="relative">
-                    <span className={isGeneratingRandom ? 'invisible' : undefined}>Random scores</span>
-                    {isGeneratingRandom && <span className="absolute inset-0 flex items-center">Generating…</span>}
+                    <span className={isGeneratingRandom ? 'invisible' : undefined}>{t('predictions.randomScores')}</span>
+                    {isGeneratingRandom && <span className="absolute inset-0 flex items-center">{t('predictions.generating')}</span>}
                   </span>
                 </button>
               )}
             </div>
 
-            {mLoading && <p className="text-gray-500 dark:text-gray-400">Loading matches…</p>}
-            {mError && <p className="text-red-500 dark:text-red-400">Failed to load matches.</p>}
+            {mLoading && <p className="text-gray-500 dark:text-gray-400">{t('predictions.loadingMatches')}</p>}
+            {mError && <p className="text-red-500 dark:text-red-400">{t('predictions.failedToLoadMatches')}</p>}
             {!mLoading && !mError && grouped.size === 0 && (
-              <p className="text-gray-500 dark:text-gray-400">No matches.</p>
+              <p className="text-gray-500 dark:text-gray-400">{t('predictions.noMatches')}</p>
             )}
 
             {(() => { let nowLineInserted = false; const renderNowMs = Date.now(); return Array.from(grouped.entries()).map(([stage, stageMatches]) => (
@@ -755,7 +758,7 @@ export function PredictionsPage() {
                             <span className="flex-1 h-0.5 bg-red-500 relative overflow-hidden rounded-full">
                               <span className="animate-now-line bg-gradient-to-r from-transparent via-white to-transparent" />
                             </span>
-                            <span className="text-xs font-semibold text-red-500 whitespace-nowrap animate-now-text">Now</span>
+                            <span className="text-xs font-semibold text-red-500 whitespace-nowrap animate-now-text">{t('predictions.now')}</span>
                           </li>
                         )}
                         <li
@@ -778,7 +781,7 @@ export function PredictionsPage() {
                                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
                                 </span>
                                 <span className="font-semibold text-red-500 animate-now-text tabular-nums">
-                                  Live <ElapsedTime
+                                  {t('predictions.live')} <ElapsedTime
                                     startMs={matchStartMs}
                                     maxMs={matchStartMs + 100 * 60 * 1000}
                                     onMax={() => setRenderTick((n) => n + 1)}
@@ -857,14 +860,14 @@ export function PredictionsPage() {
                                   if (hasPrediction) {
                                     return (
                                       <>
-                                        <span className="text-xs italic text-amber-600/70 dark:text-amber-400/60 whitespace-nowrap">🤞 fingers crossed</span>
+                                        <span className="text-xs italic text-amber-600/70 dark:text-amber-400/60 whitespace-nowrap">{t('predictions.fingersCrossed')}</span>
                                         {actualScore}
                                       </>
                                     )
                                   }
                                   return (
                                     <>
-                                      <span className="text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap"><span className="text-[0.8em]">❌</span> <span className="md:hidden">missed</span><span className="hidden md:inline">missed cutoff</span></span>
+                                      <span className="text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap"><span className="text-[0.8em]">❌</span> <span className="md:hidden">{t('predictions.missed')}</span><span className="hidden md:inline">{t('predictions.missedCutoff')}</span></span>
                                       {actualScore}
                                     </>
                                   )

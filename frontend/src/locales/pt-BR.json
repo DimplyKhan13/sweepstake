@@ -339,6 +339,15 @@
     "editingMatchesTitle": "Editando Partidas",
     "othersPredictionsTitle": "Palpites dos Outros"
   },
+  "scoringRule": {
+    "correctTournamentWinner": "🥇 Acertar o campeão do torneio",
+    "correctRunnerUp": "🥈 Acertar o vice-campeão",
+    "correctThirdPlace": "🥉 Acertar o terceiro lugar",
+    "correctGroupWinner": "👥 Acertar o vencedor do grupo",
+    "correctStageWinner": "🏆 Acertar o vencedor da fase",
+    "correctMatchWinner": "⚽ Acertar o vencedor da partida",
+    "exactMatchScore": "🎯 Acertar o placar exato"
+  },
   "language": {
     "label": "Idioma",
     "en": "English",
