@@ -29,9 +29,9 @@ export function Footer() {
           {t('footer.yourData')}
         </button>
         <a
-          href="https://github.com/vanalmsick/sweepstake"
+          href="https://github.com/DimplyKhan13/sweepstake"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="hover:text-white transition-colors"
         >
           {t('footer.openSource')}
@@ -45,30 +45,27 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300 list-disc list-inside">
               <li>
                 {t('footer.creditsLicense')}{' '}
-                <strong>SSPL v1.0</strong>{' '}
-                on{' '}
+                <a
+                  href="https://github.com/DimplyKhan13/sweepstake"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  github.com/DimplyKhan13/sweepstake
+                </a>
+                .{' '}
+                {t('footer.creditsLicenseOriginal')}{' '}
                 <a
                   href="https://github.com/vanalmsick/sweepstake"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   github.com/vanalmsick/sweepstake
                 </a>
                 .
               </li>
-              <li>
-                {t('footer.creditsBackground')}{' '}
-                <a
-                  href="https://unsplash.com/photos/soccer-field-qCrKTET_09o"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  unsplash.com
-                </a>
-                .
-              </li>
+              <li>{t('footer.creditsBackground')}</li>
               <li>
                 {t('footer.creditsLogo')}{' '}
                 <a
@@ -81,7 +78,18 @@ export function Footer() {
                 </a>
                 .
               </li>
-              <li>{t('footer.creditsTeamImages')}</li>
+              <li>
+                {t('footer.creditsTeamImages')}{' '}
+                <a
+                  href="https://flagcdn.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  flagcdn.com
+                </a>
+                .
+              </li>
               <li>
                 {t('footer.creditsTailwind')}{' '}
                 <a

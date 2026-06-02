@@ -23,7 +23,7 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
       <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
-        Sweep<span className="text-teal-500">Stake</span>
+        Bolão da Copa
       </h1>
       <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('auth.resetPassword')}</h2>
       {submitted ? (

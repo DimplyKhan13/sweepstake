@@ -42,6 +42,19 @@ export function PageShell({ children, variant = 'default' }: PageShellProps) {
           ].join(' ')}
         >
           {children}
+          {isAuth && (
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 pb-4">
+              Powered by{' '}
+              <a
+                href="https://github.com/vanalmsick/sweepstake"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-300 dark:hover:text-gray-400 transition-colors"
+              >
+                SweepStake
+              </a>
+            </p>
+          )}
           {!isAuth && <Footer />}
         </div>
       </div>

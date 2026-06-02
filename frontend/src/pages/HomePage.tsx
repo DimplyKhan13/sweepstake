@@ -178,7 +178,7 @@ export function HomePage() {
         style={{ willChange: 'opacity, transform' }}
       >
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
-          Sweep<span className="text-teal-400">Stake</span>
+          Bolão da Copa
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
           {t('home.tagline')}

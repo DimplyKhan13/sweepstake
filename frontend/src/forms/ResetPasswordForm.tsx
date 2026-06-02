@@ -33,7 +33,7 @@ export function ResetPasswordForm() {
     return (
       <div className="w-full space-y-4">
         <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
-          Sweep<span className="text-teal-500">Stake</span>
+          Bolão da Copa
         </h1>
         <p className="text-sm text-red-600 dark:text-red-400">
           {t('auth.invalidResetLink')}
@@ -50,7 +50,7 @@ export function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-4">
       <h1 className="text-3xl font-extrabold tracking-tight text-center text-gray-900 dark:text-white mb-2">
-        Sweep<span className="text-teal-500">Stake</span>
+        Bolão da Copa
       </h1>
       <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('auth.setNewPassword')}</h2>
       {(error || mismatch) && (
