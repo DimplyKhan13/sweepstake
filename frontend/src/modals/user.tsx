@@ -228,11 +228,11 @@ export function JoinTournamentModal({ onClose, initialCode }: { onClose: () => v
   const [joinCode, setJoinCode] = useState(initialCode ?? '')
   const [error, setError] = useState<string | null>(null)
 
-  const JOIN_CODE_RE = /^[A-Za-z]{0,8}\d{8,}$/
+  const JOIN_CODE_RE = /^[A-Za-z0-9]{0,8}\d{8}$/
 
   function validateJoinCode(code: string): string | null {
     if (!code) return t('user.invalidJoinCode')
-    if (code.length > 16) return t('user.joinCodeTooLong')
+    if (code.length < 8 || code.length > 16) return t('user.joinCodeTooLong')
     if (!JOIN_CODE_RE.test(code)) return t('user.joinCodeInvalid')
     return null
   }
