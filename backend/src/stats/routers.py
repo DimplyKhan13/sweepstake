@@ -11,11 +11,6 @@ from src.exceptions import CustomError
 from src.stats import crud, models
 from src.matches.crud import get_match_by_id, is_participant_or_admin
 from src.groups_stages.crud import get_group_by_id, get_stage_by_id
-from src.predictions.crud import (
-    get_group_start_datetime,
-    get_stage_start_datetime,
-    get_tournament_start_datetime,
-)
 from src.users.routers import verify_access_token
 
 router = APIRouter(prefix="/stats", tags=["stats"])
@@ -25,7 +20,7 @@ def _require_started(start_dt: Optional[datetime]) -> None:
     """Raise 403 if start_dt is None (no matches) or still in the future."""
     if start_dt is None or start_dt.astimezone(timezone.utc) > datetime.now(timezone.utc):
         raise CustomError(
-            "Access denied: predictions are hidden until the event starts",
+            "Access denied: predictions are hidden until the match starts",
             status_code=403,
         )
 
@@ -117,8 +112,7 @@ async def get_group_stats_endpoint(
 
     Start time is determined by the earliest match involving a team in this group.
 
-    Returns **403** if the caller is not a participant or admin, or if the group stage has not
-    started yet (`start_datetime` is in the future or no matches exist).
+    Returns **403** if the caller is not a participant or admin.
     Returns **404** if the group does not exist.
     """
     uid = token_payload["uid"]
@@ -130,8 +124,6 @@ async def get_group_stats_endpoint(
             "Forbidden: only participants and admins can view group stats",
             status_code=403,
         )
-    start_dt = await get_group_start_datetime(db, group_id)
-    _require_started(start_dt)
     return await crud.get_group_stats(db, group_id)
 
 
@@ -157,8 +149,7 @@ async def get_stage_stats_endpoint(
 
     Start time is determined by the earliest match in this stage.
 
-    Returns **403** if the caller is not a participant or admin, or if the stage has not
-    started yet (`start_datetime` is in the future or no matches exist).
+    Returns **403** if the caller is not a participant or admin.
     Returns **404** if the stage does not exist.
     """
     uid = token_payload["uid"]
@@ -170,8 +161,6 @@ async def get_stage_stats_endpoint(
             "Forbidden: only participants and admins can view stage stats",
             status_code=403,
         )
-    start_dt = await get_stage_start_datetime(db, stage_id)
-    _require_started(start_dt)
     return await crud.get_stage_stats(db, stage_id)
 
 
@@ -199,8 +188,7 @@ async def get_tournament_stats_endpoint(
 
     Start time is determined by the earliest match in the tournament.
 
-    Returns **403** if the caller is not a participant or admin, or if the tournament has not
-    started yet (`start_datetime` is in the future or no matches exist).
+    Returns **403** if the caller is not a participant or admin.
     """
     uid = token_payload["uid"]
     if not await is_participant_or_admin(db, tournament_id, uid):
@@ -208,6 +196,4 @@ async def get_tournament_stats_endpoint(
             "Forbidden: only participants and admins can view tournament stats",
             status_code=403,
         )
-    start_dt = await get_tournament_start_datetime(db, tournament_id)
-    _require_started(start_dt)
     return await crud.get_tournament_stats(db, tournament_id)

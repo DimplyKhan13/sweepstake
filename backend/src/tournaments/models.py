@@ -125,6 +125,17 @@ class TournamentStakePaidUpdate(SQLModel):
     stake_paid: bool = Field(..., description="Whether the participant has paid the stake")
 
 
+class TournamentAdminAction(str, Enum):
+    send_payment_reminder = "send-payment-reminder"
+    update_tournament = "update-tournament"
+    send_welcome_email = "send-welcome-email"
+
+
+class TournamentAdminActionRequest(SQLModel):
+    """Body for POST /tournament/{id}/action."""
+    action: TournamentAdminAction = Field(..., description="Admin action to perform")
+
+
 class TournamentRead(TournamentBase):
     """Response model returned by all tournament endpoints."""
     model_config = ConfigDict(from_attributes=True)

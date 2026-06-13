@@ -69,3 +69,8 @@ export interface TournamentStakePaidUpdate {
   user_id: number
   stake_paid: boolean
 }
+
+export type TournamentAdminAction =
+  | 'send-payment-reminder'
+  | 'update-tournament'
+  | 'send-welcome-email'

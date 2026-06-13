@@ -1,5 +1,5 @@
 import { baseApi, addPolling } from './baseApi'
-import type { Tournament, TournamentCreate, TournamentUpdate, TournamentMemberUpdate, TournamentStakePaidUpdate } from '../types'
+import type { Tournament, TournamentCreate, TournamentUpdate, TournamentMemberUpdate, TournamentStakePaidUpdate, TournamentAdminAction } from '../types'
 
 export const tournamentApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -83,6 +83,10 @@ export const tournamentApi = baseApi.injectEndpoints({
       },
     }),
 
+    sendAdminAction: build.mutation<void, { id: number; action: TournamentAdminAction }>({
+      query: ({ id, action }) => ({ url: `/tournament/${id}/action`, method: 'POST', body: { action } }),
+    }),
+
     joinTournament: build.mutation<Tournament, string>({
       query: (join_code) => ({ url: `/tournament/join/${join_code}`, method: 'POST' }),
       async onQueryStarted(_join_code, { dispatch, queryFulfilled }) {
@@ -105,6 +109,7 @@ const {
   useDeleteTournamentMutation,
   useManageTournamentMemberMutation,
   useSetStakePaidMutation,
+  useSendAdminActionMutation,
   useJoinTournamentMutation,
 } = tournamentApi
 
@@ -117,5 +122,6 @@ export {
   useDeleteTournamentMutation,
   useManageTournamentMemberMutation,
   useSetStakePaidMutation,
+  useSendAdminActionMutation,
   useJoinTournamentMutation,
 }

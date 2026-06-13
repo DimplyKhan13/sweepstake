@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CircleDollarSign, Crown, Loader2, UserX } from 'lucide-react'
+import { BellRing, CircleDollarSign, Crown, Loader2, RefreshCw, UserX } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   useCreateTournamentMutation,
@@ -8,7 +8,9 @@ import {
   useDeleteTournamentMutation,
   useManageTournamentMemberMutation,
   useSetStakePaidMutation,
+  useSendAdminActionMutation,
 } from '../api/tournamentApi'
+import type { TournamentAdminAction } from '../types'
 import { useListFootballDataOrgTournamentsQuery } from '../api/footballDataOrgApi'
 import { useListTeamsQuery } from '../api/teamApi'
 import { useGetMeQuery } from '../api/authApi'
@@ -355,7 +357,27 @@ export function EditTournamentModal({
   const [deleteTournament, { isLoading: isDeleting }] = useDeleteTournamentMutation()
   const [manageMember] = useManageTournamentMemberMutation()
   const [setStakePaid] = useSetStakePaidMutation()
+  const [sendAdminAction, { isLoading: isActionLoading }] = useSendAdminActionMutation()
+  const [currentAction, setCurrentAction] = useState<TournamentAdminAction | null>(null)
   const isLoading = isSaving || isDeleting
+
+  const COOLDOWN_MS = 30 * 60 * 1000
+  const lsKey = (action: TournamentAdminAction) => `action_cooldown_${tournament.id}_${action}`
+  const [lastTriggered, setLastTriggered] = useState<Partial<Record<TournamentAdminAction, number>>>(() => {
+    const actions: TournamentAdminAction[] = ['send-payment-reminder', 'update-tournament', 'send-welcome-email']
+    return Object.fromEntries(
+      actions.flatMap((a) => {
+        const v = localStorage.getItem(lsKey(a))
+        return v ? [[a, parseInt(v, 10)]] : []
+      })
+    )
+  })
+  function minsLeft(action: TournamentAdminAction): number | null {
+    const ts = lastTriggered[action]
+    if (!ts) return null
+    const left = COOLDOWN_MS - (Date.now() - ts)
+    return left > 0 ? Math.ceil(left / 60_000) : null
+  }
 
   const [name, setName] = useState(tournament.name)
   const [stake, setStake] = useState(tournament.stake ?? '')
@@ -451,6 +473,21 @@ export function EditTournamentModal({
       }
     } catch {
       setMemberError(t('createTournament.failedRemove'))
+    }
+  }
+
+  async function handleAdminAction(action: TournamentAdminAction) {
+    setError(null)
+    setCurrentAction(action)
+    try {
+      await sendAdminAction({ id: tournament.id, action }).unwrap()
+      const now = Date.now()
+      localStorage.setItem(lsKey(action), String(now))
+      setLastTriggered((prev) => ({ ...prev, [action]: now }))
+    } catch {
+      setError(t('createTournament.failedAction'))
+    } finally {
+      setCurrentAction(null)
     }
   }
 
@@ -593,15 +630,59 @@ export function EditTournamentModal({
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">{t('createTournament.noteParticipants')}</p>
           <ErrorMsg msg={memberError} />
         </div>
+        <div className="flex flex-wrap gap-2">
+          {tournament.stake && (() => {
+            const mins = minsLeft('send-payment-reminder')
+            return (
+              <button
+                type="button"
+                onClick={() => handleAdminAction('send-payment-reminder')}
+                disabled={isLoading || isActionLoading || mins !== null}
+                title={mins !== null ? t('createTournament.paymentReminderCooldown', { mins }) : undefined}
+                className="inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition"
+              >
+                {currentAction === 'send-payment-reminder'
+                  ? <Loader2 size={12} className="animate-spin" />
+                  : <BellRing size={12} />}
+                {currentAction === 'send-payment-reminder'
+                  ? t('createTournament.sendingPaymentReminders')
+                  : mins !== null
+                    ? t('createTournament.paymentReminderCooldown', { mins })
+                    : t('createTournament.sendPaymentReminders')}
+              </button>
+            )
+          })()}
+          {tournament.football_data_org_id && (() => {
+            const mins = minsLeft('update-tournament')
+            return (
+              <button
+                type="button"
+                onClick={() => handleAdminAction('update-tournament')}
+                disabled={isLoading || isActionLoading || mins !== null}
+                title={mins !== null ? t('createTournament.apiUpdateCooldown', { mins }) : undefined}
+                className="inline-flex items-center gap-1 rounded-full border border-gray-300 dark:border-gray-600 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition"
+              >
+                {currentAction === 'update-tournament'
+                  ? <Loader2 size={12} className="animate-spin" />
+                  : <RefreshCw size={12} />}
+                {currentAction === 'update-tournament'
+                  ? t('createTournament.apiUpdating')
+                  : mins !== null
+                    ? t('createTournament.apiUpdateCooldown', { mins })
+                    : t('createTournament.apiUpdate')}
+              </button>
+            )
+          })()}
+        </div>
         <ErrorMsg msg={error} />
       </ModalBody>
       <ModalFooter justify="between">
-        <BtnDanger onClick={handleDelete} disabled={isLoading} loading={isDeleting}>
+        <BtnDanger onClick={handleDelete} disabled={isLoading || isActionLoading} loading={isDeleting}>
           {isDeleting ? t('common.deleting') : t('common.delete')}
         </BtnDanger>
         <div className="flex gap-2">
           <BtnSecondary onClick={onClose}>{t('common.cancel')}</BtnSecondary>
-          <BtnPrimary onClick={handleSave} disabled={isLoading} loading={isSaving}>
+          <BtnPrimary onClick={handleSave} disabled={isLoading || isActionLoading} loading={isSaving}>
             {isSaving ? t('common.saving') : t('common.save')}
           </BtnPrimary>
         </div>

@@ -276,7 +276,14 @@
     "removeSelfConfirm": "Remover você mesmo deste bolão? Esta ação não pode ser desfeita.",
     "removeUserConfirm": "Remover \"{{name}}\" deste bolão? Esta ação não pode ser desfeita.",
     "loadingTeams": "Carregando times…",
-    "editTitle": "Editar Bolão"
+    "editTitle": "Editar Bolão",
+    "sendPaymentReminders": "Enviar Lembretes de Pagamento",
+    "sendingPaymentReminders": "Enviando…",
+    "paymentReminderCooldown": "Enviando Lembretes… (~{{mins}}m)",
+    "apiUpdate": "Atualizar via API",
+    "apiUpdating": "Atualizando…",
+    "apiUpdateCooldown": "Atualizando via API… (~{{mins}}m)",
+    "failedAction": "Falha ao executar ação. Tente novamente."
   },
   "user": {
     "profileSettings": "Configurações de Perfil",

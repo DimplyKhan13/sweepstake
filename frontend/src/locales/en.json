@@ -276,7 +276,14 @@
     "removeSelfConfirm": "Remove yourself from this tournament? This cannot be undone.",
     "removeUserConfirm": "Remove \"{{name}}\" from this tournament? This cannot be undone.",
     "loadingTeams": "Loading teams…",
-    "editTitle": "Edit Tournament"
+    "editTitle": "Edit Tournament",
+    "sendPaymentReminders": "Send Payment Reminders",
+    "sendingPaymentReminders": "Sending…",
+    "paymentReminderCooldown": "Sending Payment Reminders… (~{{mins}}m)",
+    "apiUpdate": "API Update",
+    "apiUpdating": "Updating…",
+    "apiUpdateCooldown": "API Updating… (~{{mins}}m)",
+    "failedAction": "Failed to perform action. Please try again."
   },
   "user": {
     "profileSettings": "Profile Settings",
