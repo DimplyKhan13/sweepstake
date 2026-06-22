@@ -3,7 +3,7 @@ Authentication routes: register, login, logout, change password.
 Implements secure cookie-based JWT session management.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
 from src.users import crud as user_crud, models
@@ -408,6 +408,7 @@ async def change_password(
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(
     body: models.ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -423,7 +424,7 @@ async def forgot_password(
         expire_minutes = getattr(settings, "password_reset_expire_minutes", 30)
         await create_password_reset_token(db, user.id, token, expire_minutes)
         reset_link = f"{settings.main_host.rstrip('/')}/reset-password?token={token}"
-        await send_password_reset_email(user.email, reset_link, first_name=user.first_name or "there")
+        background_tasks.add_task(send_password_reset_email, user.email, reset_link, first_name=user.first_name or "there")
         logger.info("Password reset requested for user %s", user.id)
     return {"message": "If that email is registered you will receive a reset link shortly."}
 
