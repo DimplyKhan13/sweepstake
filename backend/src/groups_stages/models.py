@@ -105,7 +105,7 @@ class StageBase(SQLModel):
     name: str = Field(..., min_length=1, max_length=255)
     winner_team_id: Optional[int] = Field(default=None)
     winner_points: Optional[int] = Field(default=None)
-    is_knockout: bool = Field(default=False)
+    is_knockout: bool = Field(default=False, sa_column_kwargs={"server_default": "false"})
 
 
 class Stage(StageBase, table=True):
