@@ -9,9 +9,10 @@ local pattern (example.*, local.*, localhost.*, *.example, *.local,
 *.localhost) the email is never dispatched.  Instead the HTML body is written
 to  data/test_email_{email_name}_{user_id}.html  and the path is logged.
 
-If SMTP is not configured (and the address is not a test address), every send
-call is suppressed and the subject + recipient are logged at WARNING level so
-the flow is still exercisable locally.
+Send priority:
+  1. Brevo HTTP API (BREVO_API_KEY) — preferred, works on Railway
+  2. SMTP (EMAIL_HOST) — fallback for self-hosted deployments
+  3. Suppressed with a WARNING log if neither is configured.
 """
 
 import asyncio
@@ -22,6 +23,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Optional
 
+import httpx
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from src.config import settings
@@ -72,11 +74,38 @@ def render_html(template_name: str, context: dict) -> str:
     return _jinja_env.get_template(template_name).render(**context)
 
 
-def _smtp_configured() -> bool:
-    return bool(settings.email_host)
+async def _send_via_brevo_api(
+    to_email: str,
+    subject: str,
+    html_body: str,
+    text_body: str,
+    reply_to: Optional[str] = None,
+) -> None:
+    """Send via Brevo transactional email HTTP API."""
+    sender_name = settings.email_from.split("@")[0].replace("-", " ").replace("_", " ").title()
+    payload: dict = {
+        "sender": {"name": sender_name, "email": settings.email_from},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_body,
+        "textContent": text_body,
+    }
+    if reply_to:
+        payload["replyTo"] = {"email": reply_to}
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        response = await client.post(
+            "https://api.brevo.com/v3/smtp/email",
+            json=payload,
+            headers={
+                "api-key": settings.brevo_api_key,
+                "Content-Type": "application/json",
+            },
+        )
+        response.raise_for_status()
 
 
-def _send_sync(
+def _send_via_smtp(
     to_email: str,
     subject: str,
     html_body: str,
@@ -119,7 +148,8 @@ async def send_email(
     Dispatch an email asynchronously.
 
     Test/local addresses are never sent; the HTML body is saved to disk instead.
-    When SMTP is unconfigured the send is suppressed with a WARNING log.
+    Prefers Brevo HTTP API if BREVO_API_KEY is set, falls back to SMTP.
+    Suppresses with a WARNING log if neither is configured.
     """
     if _is_test_address(to_email):
         try:
@@ -132,12 +162,14 @@ async def send_email(
             logger.exception("Failed to save test email for %s", to_email)
         return
 
-    if not _smtp_configured():
-        logger.warning("SMTP not configured — suppressed email to %s | subject: %s", to_email, subject)
-        return
-
     try:
-        await asyncio.to_thread(_send_sync, to_email, subject, html_body, text_body, reply_to)
+        if settings.brevo_api_key:
+            await _send_via_brevo_api(to_email, subject, html_body, text_body, reply_to)
+        elif settings.email_host:
+            await asyncio.to_thread(_send_via_smtp, to_email, subject, html_body, text_body, reply_to)
+        else:
+            logger.warning("No email transport configured — suppressed email to %s | subject: %s", to_email, subject)
+            return
         logger.info("Email sent to %s | subject: %s", to_email, subject)
     except Exception:
         logger.exception("Failed to send email to %s | subject: %s", to_email, subject)

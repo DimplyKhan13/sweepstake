@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     email_from: str = "noreply@example.com"
     email_use_ssl: bool = False
     email_use_tls: bool = True
+    brevo_api_key: str = ""
     football_data_org_api_key: str = ""
     football_data_org_api_tier: Literal["TIER_ONE", "TIER_TWO", "TIER_THREE", "TIER_FOUR"] = "TIER_ONE"
     demo_mode: bool = False
