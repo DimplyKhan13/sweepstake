@@ -1,6 +1,6 @@
 {% extends "base_email.html" %}
 
-{% block title %}Upcoming Matches – {{ tournament_name }} – SweepStake{% endblock %}
+{% block title %}Próximas Partidas – {{ tournament_name }} – Bolão da Copa{% endblock %}
 
 {% block head_extra %}
 <style type="text/css">
@@ -34,7 +34,7 @@
 
 <!-- ── Greetings ── -->
 <p style="margin:0 0 20px 0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;mso-line-height-rule:exactly;">
-  Hi {{ first_name }},
+  Olá, {{ first_name }},
 </p>
 
 <!-- ── Winner-prediction deadline reminder (shown only when first match is tomorrow) ── -->
@@ -44,31 +44,31 @@
   <tr>
     <td style="background-color:#fef3c7;border-left:4px solid #d97706;padding:16px 18px;">
       <p style="margin:0 0 6px 0;color:#92400e;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;line-height:1.4;mso-line-height-rule:exactly;">
-        &#9200; Prediction Deadline &mdash; Today at 23:59
+        &#9200; Prazo de Palpites &mdash; Hoje até 23:59
       </p>
       <p style="margin:0 0 12px 0;color:#78350f;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;mso-line-height-rule:exactly;">
-        The first match of <strong>{{ tournament_name }}</strong> kicks off tomorrow.
-        Winner predictions close <strong>tonight at 23:59</strong> &mdash; don&apos;t miss your chance to pick:
+        A primeira partida de <strong>{{ tournament_name }}</strong> começa amanhã.
+        Os palpites de vencedor encerram <strong>hoje às 23:59</strong> &mdash; não perca a chance de escolher:
       </p>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0">
         {% if winner_reminder.has_tournament %}
         <tr>
           <td style="padding:2px 0;color:#92400e;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;mso-line-height-rule:exactly;">
-            &#127942;&nbsp; Tournament Winner
+            &#127942;&nbsp; Campeão do Torneio
           </td>
         </tr>
         {% endif %}
         {% if winner_reminder.has_groups %}
         <tr>
           <td style="padding:2px 0;color:#92400e;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;mso-line-height-rule:exactly;">
-            &#129351;&nbsp; Group Winners
+            &#129351;&nbsp; Vencedores de Grupo
           </td>
         </tr>
         {% endif %}
         {% if winner_reminder.has_stages %}
         <tr>
           <td style="padding:2px 0;color:#92400e;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;mso-line-height-rule:exactly;">
-            &#127941;&nbsp; Stage Winners
+            &#127941;&nbsp; Vencedores de Fase
           </td>
         </tr>
         {% endif %}
@@ -80,7 +80,7 @@
 
 <!-- ── Message ── -->
 <p style="margin:0 0 20px 0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;mso-line-height-rule:exactly;">
-  Have you already placed your predictions for the next matches in <strong>{{ tournament_name }}</strong>? Or do you want to change them? Don't forget to do so, as your predictions will be locked as soon as the match starts!
+  Você já fez seus palpites para as próximas partidas do <strong>{{ tournament_name }}</strong>? Ou quer alterá-los? Não esqueça, pois seus palpites serão bloqueados assim que a partida começar!
 </p>
 
 <!-- ── Match table ── -->
@@ -90,16 +90,16 @@
   <!-- Header row -->
   <tr>
     <td width="72" style="padding:8px 8px;background-color:#f9fafb;border-bottom:2px solid #001440;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;mso-line-height-rule:exactly;line-height:16px;">
-      Time
+      Horário
     </td>
     <td colspan="2" style="padding:8px 8px;background-color:#f9fafb;border-bottom:2px solid #001440;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;mso-line-height-rule:exactly;line-height:16px;">
-      Home
+      Casa
     </td>
     <td width="80" align="center" style="padding:8px 6px;background-color:#f9fafb;border-bottom:2px solid #001440;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;text-align:center;mso-line-height-rule:exactly;line-height:16px;">
-      Prediction
+      Palpite
     </td>
     <td colspan="2" align="right" style="padding:8px 8px;background-color:#f9fafb;border-bottom:2px solid #001440;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;text-align:right;mso-line-height-rule:exactly;line-height:16px;">
-      Away
+      Visitante
     </td>
     <td class="match-tv-th" width="60" style="padding:8px 8px;background-color:#f9fafb;border-bottom:2px solid #001440;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;mso-line-height-rule:exactly;line-height:16px;">
       TV
@@ -177,7 +177,7 @@
 
 <!-- ── Message ── -->
 <p style="margin:0 0 20px 0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;mso-line-height-rule:exactly;">
-  See how you are doing on the leaderboard, what other's predicted (🔍 icons), or change your upcoming predictions:
+  Veja como você está no placar, o que os outros palpitaram (ícones 🔍), ou altere seus próximos palpites:
 </p>
 
 <!-- ── Call-to-action buttons ── -->
@@ -192,13 +192,13 @@
                    arcsize="11%" strokecolor="#1d4ed8" fillcolor="#001440">
         <w:anchorlock/>
         <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;">
-          My Predictions
+          Meus Palpites
         </center>
       </v:roundrect>
       <![endif]--><!--[if !mso]><!-->
       <a href="{{ tournament_url }}/predictions/my"
          style="background-color:#001440;border-radius:6px;color:#ffffff;display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;padding:12px 36px;text-align:center;text-decoration:none;-webkit-text-size-adjust:none;">
-        My Predictions
+        Meus Palpites
       </a>
       <!--<![endif]-->
     </td>
@@ -211,13 +211,13 @@
                    arcsize="11%" strokecolor="#1d4ed8" fillcolor="#001440">
         <w:anchorlock/>
         <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;">
-          Leaderboard
+          Classificação
         </center>
       </v:roundrect>
       <![endif]--><!--[if !mso]><!-->
       <a href="{{ tournament_url }}/leaderboard"
          style="background-color:#001440;border-radius:6px;color:#ffffff;display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;padding:12px 36px;text-align:center;text-decoration:none;-webkit-text-size-adjust:none;">
-        Leaderboard
+        Classificação
       </a>
       <!--<![endif]-->
     </td>
@@ -226,17 +226,17 @@
 
 <!-- ── Sign-off ── -->
 <p style="margin:0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;mso-line-height-rule:exactly;">
-  Good luck! &#127942;<br><br>
-  Best regards,<br>
+  Boa sorte! &#127942;<br><br>
+  Atenciosamente,<br>
   <strong style="color:#111827;font-family:Arial,Helvetica,sans-serif;">{{ admin_sign_off }}</strong>
 </p>
 
 {% endblock %}
 
 {% block footer_note %}
-  You received this email because you are a participant in the <strong>{{ tournament_name }}</strong> competition on SweepStake.
+  Você recebeu este e-mail porque participa da competição <strong>{{ tournament_name }}</strong> no Bolão da Copa.
   {% if admin_footer %}
-  <br><strong>Organised by:</strong>
+  <br><strong>Organizado por:</strong>
   {% for a in admin_footer %}{{ a.full_name }} ({{ a.email }}){% if not loop.last %}, {% endif %}{% endfor %}
   {% endif %}
 {% endblock %}
