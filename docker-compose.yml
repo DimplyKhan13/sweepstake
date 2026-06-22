@@ -42,6 +42,7 @@ services:
       # (even though the request succeeds, the cookie is never stored/sent).
       # Set to "true" only when this container is behind a TLS-terminating proxy.
       HTTPS_AUTH_ONLY: "false"
+      APP_VERSION: "bolao-1.0.0"
 
       # Set to "true" to load test data on startup (for testing/demo purposes).
       # Don't use this in production.

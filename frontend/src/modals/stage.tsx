@@ -45,6 +45,10 @@ export function StageManagerModal({
     })
   }, [stages])
 
+  async function handleKnockoutToggle(id: number, value: boolean) {
+    await updateStage({ id, tournamentId, data: { is_knockout: value } })
+  }
+
   async function handleRename(id: number) {
     const name = editNames[id]?.trim()
     const original = stages.find((s) => s.id === id)?.name
@@ -74,6 +78,9 @@ export function StageManagerModal({
             </span>
             <span className="flex-1 min-w-0 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
               {t('stage.winnerCol')}
+            </span>
+            <span className="w-16 flex-shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide text-center">
+              {t('stage.knockoutCol')}
             </span>
             <span className="w-[15px] flex-shrink-0" />
           </div>
@@ -105,6 +112,16 @@ export function StageManagerModal({
                   </option>
                 ))}
               </select>
+              <div className="w-16 flex-shrink-0 flex justify-center">
+                <input
+                  type="checkbox"
+                  checked={s.is_knockout}
+                  onChange={(e) => handleKnockoutToggle(s.id, e.target.checked)}
+                  disabled={isLoading}
+                  title={t('stage.knockoutTooltip')}
+                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-400 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => {

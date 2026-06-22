@@ -159,7 +159,10 @@
     "now": "Agora",
     "live": "Ao Vivo",
     "ptsEachLabel": "+{{count}} pts cada",
-    "confirmAdminEdit": "Tem certeza que deseja editar os palpites de {{name}}?"
+    "confirmAdminEdit": "Tem certeza que deseja editar os palpites de {{name}}?",
+    "advances": "Avança",
+    "auto": "auto",
+    "penWinner": "Vence nos pênaltis"
   },
   "footer": {
     "credits": "Créditos",
@@ -199,7 +202,8 @@
     "deleteConfirm": "Excluir esta partida? Esta ação não pode ser desfeita e todos os palpites dos usuários também serão excluídos permanentemente.",
     "failedDelete": "Falha ao excluir partida. Tente novamente.",
     "failedSave": "Falha ao salvar alterações. Tente novamente.",
-    "startRequired": "Data e horário de início são obrigatórios."
+    "startRequired": "Data e horário de início são obrigatórios.",
+    "penWinner": "Vencedor nos pênaltis (após empate)"
   },
   "matchStats": {
     "finalScore": "Placar Final",
@@ -208,7 +212,9 @@
     "player": "Jogador",
     "prediction": "Palpite",
     "points": "Pontos",
-    "loading": "Carregando estatísticas…"
+    "loading": "Carregando estatísticas…",
+    "penaltiesLabel": "Pênaltis:",
+    "penPick": "Pênaltis"
   },
   "stage": {
     "manageStages": "Gerenciar Fases",
@@ -216,7 +222,9 @@
     "winnerCol": "Vencedor",
     "noWinner": "— Sem vencedor —",
     "newStagePlaceholder": "Nome da nova fase…",
-    "deleteConfirm": "Excluir a fase \"{{name}}\"? Esta ação não pode ser desfeita e todas as partidas desta fase serão reatribuídas a \"Fase Desconhecida\"."
+    "deleteConfirm": "Excluir a fase \"{{name}}\"? Esta ação não pode ser desfeita e todas as partidas desta fase serão reatribuídas a \"Fase Desconhecida\".",
+    "knockoutCol": "Eliminatória",
+    "knockoutTooltip": "Ative para mostrar o seletor de pênaltis nos palpites desta fase"
   },
   "team": {
     "name": "Nome",
@@ -254,6 +262,7 @@
     "exactScorePoints": "🎯 Pontos por placar exato",
     "groupWinnerPoints": "👥 Pontos por vencedor de grupo",
     "stageWinnerPoints": "🏆 Pontos por vencedor de fase",
+    "penaltyWinnerPoints": "🥅 Bônus por avanço nos pênaltis",
     "firstPlaceWinner": "🥇 Vencedor 1º lugar",
     "secondPlaceWinner": "🥈 Vencedor 2º lugar",
     "thirdPlaceWinner": "🥉 Vencedor 3º lugar",
@@ -354,7 +363,8 @@
     "correctGroupWinner": "👥 Acertar o vencedor do grupo",
     "correctStageWinner": "🏆 Acertar o vencedor da fase",
     "correctMatchWinner": "⚽ Acertar o vencedor da partida",
-    "exactMatchScore": "🎯 Acertar o placar exato"
+    "exactMatchScore": "🎯 Acertar o placar exato",
+    "penaltyWinner": "🥅 Acertar quem avança no Mata a Mata"
   },
   "language": {
     "label": "Idioma",

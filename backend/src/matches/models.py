@@ -44,6 +44,10 @@ class Match(MatchBase, table=True):
         default=None,
         sa_column=sa.Column(sa.Integer, sa.ForeignKey("stage.id", ondelete="SET NULL"), nullable=True, index=True)
     )
+    penalty_winner_team_id: Optional[int] = Field(
+        default=None,
+        sa_column=sa.Column(sa.Integer, sa.ForeignKey("team.id", ondelete="SET NULL"), nullable=True)
+    )
 
     home_team: Optional[Team] = Relationship(
         sa_relationship_kwargs={
@@ -89,6 +93,7 @@ class MatchUpdate(MatchBase):
     home_team_id: Optional[int] = None
     away_team_id: Optional[int] = None
     stage_id: Optional[int] = None
+    penalty_winner_team_id: Optional[int] = None
 
 
 class MatchRead(MatchBase):
@@ -100,6 +105,7 @@ class MatchRead(MatchBase):
     home_team_id: Optional[int] = None
     away_team_id: Optional[int] = None
     stage_id: Optional[int] = None
+    penalty_winner_team_id: Optional[int] = None
     home_team: Optional[TeamRead] = None
     away_team: Optional[TeamRead] = None
     stage: Optional[StageRead] = Field(default=None, exclude=True)

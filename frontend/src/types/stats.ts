@@ -12,6 +12,7 @@ export interface UserPredictionMatch {
   user_name: string | null
   home_score: number | null
   away_score: number | null
+  penalty_winner_team_id: number | null
   points_earned: number | null
 }
 
@@ -20,6 +21,7 @@ export interface MatchStats {
   start_datetime: string | null
   home_goals: number | null
   away_goals: number | null
+  penalty_winner_team_id: number | null
   predictions: UserPredictionMatch[]
 }
 

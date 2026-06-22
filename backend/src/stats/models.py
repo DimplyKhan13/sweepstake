@@ -25,6 +25,7 @@ class UserPredictionMatch(SQLModel):
     user_name: Optional[str] = None
     home_score: Optional[int] = None
     away_score: Optional[int] = None
+    penalty_winner_team_id: Optional[int] = None
     points_earned: Optional[int] = None
 
 
@@ -35,6 +36,7 @@ class MatchStatsRead(SQLModel):
     start_datetime: Optional[datetime] = None
     home_goals: Optional[int] = None
     away_goals: Optional[int] = None
+    penalty_winner_team_id: Optional[int] = None
     predictions: List[UserPredictionMatch]
 
 

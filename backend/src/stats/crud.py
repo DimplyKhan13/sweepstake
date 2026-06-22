@@ -135,6 +135,7 @@ async def get_match_stats(db: AsyncSession, match_id: int) -> MatchStatsRead:
             user_name=user_name or first_name,
             home_score=pred.home_score,
             away_score=pred.away_score,
+            penalty_winner_team_id=pred.penalty_winner_team_id,
             points_earned=pred.points_earned,
         )
         for pred, user_name, first_name in rows
@@ -144,6 +145,7 @@ async def get_match_stats(db: AsyncSession, match_id: int) -> MatchStatsRead:
         start_datetime=match.start_datetime,
         home_goals=match.home_goals,
         away_goals=match.away_goals,
+        penalty_winner_team_id=match.penalty_winner_team_id,
         predictions=predictions,
     )
 

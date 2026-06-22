@@ -280,9 +280,131 @@ function TeamSelect({
   )
 }
 
+/** Penalty winner row shown below score inputs for knockout matches */
+function PenaltyPicker({
+  match,
+  prediction,
+  isOwn,
+  disabled,
+  userId,
+  tournamentId,
+  onBeforeSave,
+}: {
+  match: import('../types').Match
+  prediction: MatchPrediction | undefined
+  isOwn: boolean
+  disabled?: boolean
+  userId?: number
+  tournamentId?: number
+  onBeforeSave?: () => boolean
+}) {
+  const { t } = useTranslation()
+  const [upsert] = useUpsertMatchPredictionMutation()
+
+  const homeScore = prediction?.home_score
+  const awayScore = prediction?.away_score
+  const isDraw = homeScore != null && awayScore != null && homeScore === awayScore
+  const nonDrawAdvance = homeScore != null && awayScore != null && homeScore !== awayScore
+    ? (homeScore > awayScore ? match.home_team_id : match.away_team_id)
+    : null
+
+  function savePenaltyWinner(teamId: number | null) {
+    if (onBeforeSave && !onBeforeSave()) return
+    upsert({
+      match_id: match.id,
+      home_score: homeScore ?? undefined,
+      away_score: awayScore ?? undefined,
+      penalty_winner_team_id: teamId,
+      ...(userId !== undefined ? { userId } : {}),
+      ...(tournamentId !== undefined ? { tournamentId } : {}),
+    })
+  }
+
+  const homeTeam = match.home_team
+  const awayTeam = match.away_team
+
+  // Read-only display
+  if (!isOwn || disabled) {
+    const penId = prediction?.penalty_winner_team_id
+    const advanceId = penId ?? nonDrawAdvance
+    const advanceTeam = advanceId === match.home_team_id ? homeTeam : advanceId === match.away_team_id ? awayTeam : null
+
+    // Draw prediction with no penalty pick — show placeholder so the draw is visible
+    if (!advanceTeam && isDraw) {
+      return (
+        <div className="flex items-center justify-center gap-1 mt-0.5">
+          <span className="text-xs text-gray-400 dark:text-gray-500">{t('predictions.advances')}:</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+        </div>
+      )
+    }
+
+    if (!advanceTeam) return null
+    return (
+      <div className="flex items-center justify-center gap-1 mt-0.5">
+        <span className="text-xs text-gray-400 dark:text-gray-500">{t('predictions.advances')}:</span>
+        {advanceTeam.image_url && (
+          <img src={advanceTeam.image_url} alt={advanceTeam.name} decoding="async" referrerPolicy="no-referrer" className="h-3.5 w-3.5 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />
+        )}
+        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{advanceTeam.iso_code ?? advanceTeam.name}</span>
+        {!penId && nonDrawAdvance && <span className="text-xs text-gray-400 dark:text-gray-500 italic">{t('predictions.auto')}</span>}
+      </div>
+    )
+  }
+
+  if (nonDrawAdvance) {
+    const advanceTeam = nonDrawAdvance === match.home_team_id ? homeTeam : awayTeam
+    return (
+      <div className="flex items-center justify-center gap-1 mt-0.5">
+        <span className="text-xs text-gray-400 dark:text-gray-500">{t('predictions.advances')}:</span>
+        {advanceTeam?.image_url && (
+          <img src={advanceTeam.image_url} alt={advanceTeam.name} decoding="async" referrerPolicy="no-referrer" className="h-3.5 w-3.5 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />
+        )}
+        <span className="text-xs text-gray-400 dark:text-gray-500 italic">{advanceTeam?.iso_code ?? advanceTeam?.name} ({t('predictions.auto')})</span>
+      </div>
+    )
+  }
+
+  if (!isDraw) return null
+
+  const selectedId = prediction?.penalty_winner_team_id
+
+  return (
+    <div className="flex items-center justify-center gap-1 mt-1" onClick={(e) => e.stopPropagation()}>
+      <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">{t('predictions.penWinner')}:</span>
+      <div className="flex gap-1">
+        {([homeTeam, awayTeam] as const).map((team) => {
+          if (!team) return null
+          const selected = selectedId === team.id
+          return (
+            <button
+              key={team.id}
+              type="button"
+              onClick={() => savePenaltyWinner(selected ? null : team.id)}
+              className={[
+                'flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium border transition',
+                selected
+                  ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-400 dark:border-blue-500 text-blue-700 dark:text-blue-300'
+                  : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-600',
+              ].join(' ')}
+            >
+              {team.image_url && (
+                <img src={team.image_url} alt={team.name} decoding="async" referrerPolicy="no-referrer" className="h-3.5 w-3.5 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />
+              )}
+              {team.iso_code ?? team.name}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /** Controlled score input pair that saves on blur */
 function ScoreInput({
   matchId,
+  match,
+  isKnockout,
   prediction,
   isOwn,
   disabled,
@@ -291,6 +413,8 @@ function ScoreInput({
   onBeforeSave,
 }: {
   matchId: number
+  match?: import('../types').Match
+  isKnockout?: boolean
   prediction: MatchPrediction | undefined
   isOwn: boolean
   disabled?: boolean
@@ -321,41 +445,67 @@ function ScoreInput({
     const h = prediction?.home_score
     const a = prediction?.away_score
     return (
-      <span className="min-w-[80px] text-center text-sm font-mono font-semibold text-gray-500 dark:text-gray-400">
-        {h != null && a != null ? `${h} – ${a}` : '— : —'}
-      </span>
+      <div className="flex flex-col items-center min-w-[80px]">
+        <span className="text-center text-sm font-mono font-semibold text-gray-500 dark:text-gray-400">
+          {h != null && a != null ? `${h} – ${a}` : '— : —'}
+        </span>
+        {isKnockout && match && (
+          <PenaltyPicker
+            match={match}
+            prediction={prediction}
+            isOwn={isOwn}
+            disabled={disabled}
+            userId={userId}
+            tournamentId={tournamentId}
+            onBeforeSave={onBeforeSave}
+          />
+        )}
+      </div>
     )
   }
 
   return (
-    <div className="flex items-center gap-1 min-w-[80px] justify-center">
-      <input
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        autoComplete="off"
-        data-form-type="other"
-        data-lpignore="true"
-        name="home-goals"
-        value={home}
-        onChange={(e) => setHome(e.target.value.replace(/[^0-9]/g, ''))}
-        onBlur={save}
-        className="w-9 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-center text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <span className="text-gray-500 dark:text-gray-400 font-mono">–</span>
-      <input
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        autoComplete="off"
-        data-form-type="other"
-        data-lpignore="true"
-        name="away-goals"
-        value={away}
-        onChange={(e) => setAway(e.target.value.replace(/[^0-9]/g, ''))}
-        onBlur={save}
-        className="w-9 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-center text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
+    <div className="flex flex-col items-center gap-0.5 min-w-[80px]">
+      <div className="flex items-center gap-1 justify-center">
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="off"
+          data-form-type="other"
+          data-lpignore="true"
+          name="home-goals"
+          value={home}
+          onChange={(e) => setHome(e.target.value.replace(/[^0-9]/g, ''))}
+          onBlur={save}
+          className="w-9 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-center text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <span className="text-gray-500 dark:text-gray-400 font-mono">–</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="off"
+          data-form-type="other"
+          data-lpignore="true"
+          name="away-goals"
+          value={away}
+          onChange={(e) => setAway(e.target.value.replace(/[^0-9]/g, ''))}
+          onBlur={save}
+          className="w-9 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-center text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+      {isKnockout && match && (
+        <PenaltyPicker
+          match={match}
+          prediction={prediction}
+          isOwn={isOwn}
+          disabled={disabled}
+          userId={userId}
+          tournamentId={tournamentId}
+          onBeforeSave={onBeforeSave}
+        />
+      )}
     </div>
   )
 }
@@ -807,6 +957,8 @@ export function PredictionsPage() {
                           <div className="row-start-2 col-start-2 md:row-auto md:col-auto flex justify-center items-center" onClick={(e) => e.stopPropagation()}>
                             <ScoreInput
                               matchId={match.id}
+                              match={match}
+                              isKnockout={stages.find((s) => s.id === match.stage_id)?.is_knockout ?? false}
                               prediction={predictionMap.get(match.id)}
                               isOwn={isEditable}
                               disabled={matchDisabled || isGeneratingRandom}
@@ -830,9 +982,20 @@ export function PredictionsPage() {
                           {/* Mobile-only: actual match score centred in row 1 between date and status */}
                           {match.home_goals != null && match.away_goals != null && (
                             <div className="flex md:hidden row-start-1 col-start-2 justify-center items-center self-center">
-                              <span className="text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap font-mono">
-                                (Match: {match.home_goals}-{match.away_goals})
-                              </span>
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span className="text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap font-mono">
+                                  (Match: {match.home_goals}-{match.away_goals})
+                                </span>
+                                {match.penalty_winner_team_id != null && (() => {
+                                  const penTeam = match.penalty_winner_team_id === match.home_team_id ? match.home_team : match.away_team
+                                  return (
+                                    <span className="flex items-center gap-0.5">
+                                      {penTeam?.image_url && <img src={penTeam.image_url} alt={penTeam.name} decoding="async" referrerPolicy="no-referrer" className="h-3 w-3 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />}
+                                      <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 leading-none">{penTeam?.iso_code ?? penTeam?.name}</span>
+                                    </span>
+                                  )
+                                })()}
+                              </div>
                             </div>
                           )}
                           <div className="row-start-1 col-start-3 md:row-auto md:col-auto justify-self-end flex items-center gap-1.5">
@@ -841,9 +1004,20 @@ export function PredictionsPage() {
                                 const pred = predictionMap.get(match.id)
                                 const isPast = matchStartMs <= renderNowMs
                                 const actualScore = match.home_goals != null && match.away_goals != null ? (
-                                  <span className="hidden md:inline text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap font-mono">
-                                    (Match: {match.home_goals}-{match.away_goals})
-                                  </span>
+                                  <div className="hidden md:flex flex-col items-end gap-0.5">
+                                    <span className="text-xs italic text-gray-400 dark:text-gray-500 whitespace-nowrap font-mono">
+                                      (Match: {match.home_goals}-{match.away_goals})
+                                    </span>
+                                    {match.penalty_winner_team_id != null && (() => {
+                                      const penTeam = match.penalty_winner_team_id === match.home_team_id ? match.home_team : match.away_team
+                                      return (
+                                        <span className="flex items-center gap-0.5 justify-end">
+                                          {penTeam?.image_url && <img src={penTeam.image_url} alt={penTeam.name} decoding="async" referrerPolicy="no-referrer" className="h-3 w-3 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />}
+                                          <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 leading-none">{penTeam?.iso_code ?? penTeam?.name}</span>
+                                        </span>
+                                      )
+                                    })()}
+                                  </div>
                                 ) : null
                                 if (pred?.points_earned != null) {
                                   return (

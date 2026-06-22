@@ -90,6 +90,21 @@ def _match_winner(home: int, away: int) -> str:
     return "draw"
 
 
+def _predicted_advance(pred: PredictMatch, match: Match) -> int | None:
+    """Return the team_id the predictor expects to advance.
+
+    For non-draw predictions the advancing team is inferred from the score.
+    For draw predictions the user must explicitly set penalty_winner_team_id.
+    """
+    if pred.home_score is None or pred.away_score is None:
+        return None
+    if pred.home_score > pred.away_score:
+        return match.home_team_id
+    if pred.away_score > pred.home_score:
+        return match.away_team_id
+    return pred.penalty_winner_team_id
+
+
 def _compute_match_points(
     pred: PredictMatch,
     match: Match,
@@ -102,6 +117,10 @@ def _compute_match_points(
     - score  = match_score_points  if exact score matches
     - winner = match_winner_points if correct outcome (win/draw) matches
     - 0      otherwise
+
+    Penalty bonus: when a match goes to penalties (match.penalty_winner_team_id is set),
+    award penalty_winner_points to any predictor whose predicted advancing team matches
+    the actual penalty winner.  The bonus stacks on top of any base points.
     """
     if match.home_goals is None or match.away_goals is None:
         return None
@@ -110,15 +129,20 @@ def _compute_match_points(
     match_score_points = tournament.match_score_points or 0
 
     if pred.home_score is None or pred.away_score is None:
-        return 0
+        base = 0
+    elif pred.home_score == match.home_goals and pred.away_score == match.away_goals:
+        base = match_score_points
+    elif _match_winner(pred.home_score, pred.away_score) == _match_winner(match.home_goals, match.away_goals):
+        base = match_winner_points
+    else:
+        base = 0
 
-    if pred.home_score == match.home_goals and pred.away_score == match.away_goals:
-        return match_score_points
+    if match.penalty_winner_team_id is not None:
+        predicted_advance = _predicted_advance(pred, match)
+        if predicted_advance is not None and predicted_advance == match.penalty_winner_team_id:
+            base += tournament.penalty_winner_points or 0
 
-    if _match_winner(pred.home_score, pred.away_score) == _match_winner(match.home_goals, match.away_goals):
-        return match_winner_points
-
-    return 0
+    return base
 
 
 async def recalculate_match_points(db: AsyncSession, match_id: int) -> None:

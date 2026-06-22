@@ -17,6 +17,7 @@ export interface Match {
   start_datetime: string
   home_goals: number | null
   away_goals: number | null
+  penalty_winner_team_id: number | null
   football_data_org_id: number | null
   home_team: TeamRead | null
   away_team: TeamRead | null
@@ -39,5 +40,6 @@ export interface MatchCreate {
 export interface MatchUpdate extends Partial<Omit<MatchCreate, 'tournament_id' | 'home_goals' | 'away_goals' | 'tv_channel'>> {
   home_goals?: number | null
   away_goals?: number | null
+  penalty_winner_team_id?: number | null
   tv_channel?: string | null
 }

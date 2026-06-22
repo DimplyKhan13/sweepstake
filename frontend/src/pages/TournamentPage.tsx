@@ -114,6 +114,7 @@ export function TournamentPage() {
     { label: t('scoringRule.correctStageWinner'), points: tournament.stage_winner_points },
     { label: t('scoringRule.correctMatchWinner'), points: tournament.match_winner_points },
     { label: t('scoringRule.exactMatchScore'), points: tournament.match_score_points },
+    { label: t('scoringRule.penaltyWinner'), points: tournament.penalty_winner_points },
   ].filter((r) => r.points != null && r.points !== 0)
 
   const cutoff = new Date(Date.now() - 36 * 60 * 60 * 1000)
@@ -395,9 +396,26 @@ export function TournamentPage() {
                       </div>
 
                       {/* Score — row 2 center on mobile, col 3 on desktop */}
-                      <span className="row-start-2 col-start-2 sm:row-auto sm:col-auto min-w-[48px] text-center text-sm font-mono font-semibold text-gray-700 dark:text-gray-300">
-                        {hasScore ? `${homeGoals} – ${awayGoals}` : 'vs'}
-                      </span>
+                      <div className="row-start-2 col-start-2 sm:row-auto sm:col-auto flex flex-col items-center min-w-[48px]">
+                        <span className="text-center text-sm font-mono font-semibold text-gray-700 dark:text-gray-300">
+                          {hasScore ? `${homeGoals} – ${awayGoals}` : 'vs'}
+                        </span>
+                        {match.penalty_winner_team_id != null && (() => {
+                          const penTeam = match.penalty_winner_team_id === match.home_team_id
+                            ? match.home_team
+                            : match.away_team
+                          return (
+                            <span className="flex items-center gap-0.5 mt-0.5">
+                              {penTeam?.image_url && (
+                                <img src={penTeam.image_url} alt={penTeam.name} decoding="async" referrerPolicy="no-referrer" className="h-3 w-3 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0" />
+                              )}
+                              <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 leading-none">
+                                {penTeam?.iso_code ?? penTeam?.name ?? t('matchStats.penaltiesLabel')}
+                              </span>
+                            </span>
+                          )
+                        })()}
+                      </div>
 
                       {/* Away team: crest + name — row 2 right on mobile, col 4 on desktop */}
                       <div

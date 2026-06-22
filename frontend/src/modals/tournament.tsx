@@ -46,6 +46,8 @@ type PointState = {
   setGroupWinnerPoints: (v: string) => void
   stageWinnerPoints: string
   setStageWinnerPoints: (v: string) => void
+  penaltyWinnerPoints: string
+  setPenaltyWinnerPoints: (v: string) => void
 }
 
 function PointFields(p: PointState & { disabled?: boolean }) {
@@ -58,6 +60,7 @@ function PointFields(p: PointState & { disabled?: boolean }) {
     { label: t('createTournament.exactScorePoints'), value: p.matchScorePoints, set: p.setMatchScorePoints },
     { label: t('createTournament.groupWinnerPoints'), value: p.groupWinnerPoints, set: p.setGroupWinnerPoints },
     { label: t('createTournament.stageWinnerPoints'), value: p.stageWinnerPoints, set: p.setStageWinnerPoints },
+    { label: t('createTournament.penaltyWinnerPoints'), value: p.penaltyWinnerPoints, set: p.setPenaltyWinnerPoints },
   ]
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -174,6 +177,10 @@ function EditPointAndTeamFields(p: EditPointAndTeamState) {
         <FieldLabel>{t('createTournament.matchWinnerPoints')}</FieldLabel>
         {numInput(p.matchWinnerPoints, p.setMatchWinnerPoints)}
       </div>
+      <div>
+        <FieldLabel>{t('createTournament.penaltyWinnerPoints')}</FieldLabel>
+        {numInput(p.penaltyWinnerPoints, p.setPenaltyWinnerPoints)}
+      </div>
     </div>
   )
 }
@@ -272,6 +279,7 @@ export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
   const [matchScorePoints, setMatchScorePoints] = useState('5')
   const [groupWinnerPoints, setGroupWinnerPoints] = useState('8')
   const [stageWinnerPoints, setStageWinnerPoints] = useState('')
+  const [penaltyWinnerPoints, setPenaltyWinnerPoints] = useState('2')
   const [error, setError] = useState<string | null>(null)
 
   async function handleCreate() {
@@ -289,6 +297,7 @@ export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
         match_score_points: matchScorePoints !== '' ? Number(matchScorePoints) : undefined,
         group_winner_points: groupWinnerPoints !== '' ? Number(groupWinnerPoints) : undefined,
         stage_winner_points: stageWinnerPoints !== '' ? Number(stageWinnerPoints) : undefined,
+        penalty_winner_points: penaltyWinnerPoints !== '' ? Number(penaltyWinnerPoints) : undefined,
       }).unwrap()
       onClose()
       navigate(`/tournament/${tournament.id}?guide=admin`)
@@ -325,6 +334,8 @@ export function CreateTournamentModal({ onClose }: { onClose: () => void }) {
           setGroupWinnerPoints={setGroupWinnerPoints}
           stageWinnerPoints={stageWinnerPoints}
           setStageWinnerPoints={setStageWinnerPoints}
+          penaltyWinnerPoints={penaltyWinnerPoints}
+          setPenaltyWinnerPoints={setPenaltyWinnerPoints}
           disabled={isLoading}
         />
         <ErrorMsg msg={error} />
@@ -404,6 +415,9 @@ export function EditTournamentModal({
   )
   const [stageWinnerPoints, setStageWinnerPoints] = useState(
     tournament.stage_winner_points?.toString() ?? '',
+  )
+  const [penaltyWinnerPoints, setPenaltyWinnerPoints] = useState(
+    tournament.penalty_winner_points?.toString() ?? '',
   )
   const [firstPlaceTeamId, setFirstPlaceTeamId] = useState(
     tournament.first_place_team_id?.toString() ?? '',
@@ -525,6 +539,7 @@ export function EditTournamentModal({
           match_score_points: matchScorePoints !== '' ? Number(matchScorePoints) : undefined,
           group_winner_points: groupWinnerPoints !== '' ? Number(groupWinnerPoints) : undefined,
           stage_winner_points: stageWinnerPoints !== '' ? Number(stageWinnerPoints) : undefined,
+          penalty_winner_points: penaltyWinnerPoints !== '' ? Number(penaltyWinnerPoints) : undefined,
         },
       }).unwrap()
       onClose()
@@ -561,6 +576,8 @@ export function EditTournamentModal({
           setGroupWinnerPoints={setGroupWinnerPoints}
           stageWinnerPoints={stageWinnerPoints}
           setStageWinnerPoints={setStageWinnerPoints}
+          penaltyWinnerPoints={penaltyWinnerPoints}
+          setPenaltyWinnerPoints={setPenaltyWinnerPoints}
           firstPlaceTeamId={firstPlaceTeamId}
           setFirstPlaceTeamId={setFirstPlaceTeamId}
           secondPlaceTeamId={secondPlaceTeamId}

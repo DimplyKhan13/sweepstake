@@ -159,7 +159,10 @@
     "now": "Now",
     "live": "Live",
     "ptsEachLabel": "+{{count}} pts each",
-    "confirmAdminEdit": "Are you sure you want to edit {{name}}'s predictions?"
+    "confirmAdminEdit": "Are you sure you want to edit {{name}}'s predictions?",
+    "advances": "Advances",
+    "auto": "auto",
+    "penWinner": "Pen winner"
   },
   "footer": {
     "credits": "Credits",
@@ -199,7 +202,8 @@
     "deleteConfirm": "Delete this match? This cannot be undone and all user predictions will also be unrecoverably deleted.",
     "failedDelete": "Failed to delete match. Please try again.",
     "failedSave": "Failed to save changes. Please try again.",
-    "startRequired": "Start date and time is required."
+    "startRequired": "Start date and time is required.",
+    "penWinner": "Penalty winner (after draw)"
   },
   "matchStats": {
     "finalScore": "Final Score",
@@ -208,7 +212,9 @@
     "player": "Player",
     "prediction": "Prediction",
     "points": "Points",
-    "loading": "Loading stats…"
+    "loading": "Loading stats…",
+    "penaltiesLabel": "Pen winner:",
+    "penPick": "Pen pick"
   },
   "stage": {
     "manageStages": "Manage Stages",
@@ -216,7 +222,9 @@
     "winnerCol": "Winner",
     "noWinner": "— No winner —",
     "newStagePlaceholder": "New stage name…",
-    "deleteConfirm": "Delete stage \"{{name}}\"? This cannot be undone and all matches in this stage will be re-assigned to \"Unknown Stage\"."
+    "deleteConfirm": "Delete stage \"{{name}}\"? This cannot be undone and all matches in this stage will be re-assigned to \"Unknown Stage\".",
+    "knockoutCol": "Knockout",
+    "knockoutTooltip": "Enable to show penalty tiebreaker picker on match predictions"
   },
   "team": {
     "name": "Name",
@@ -254,6 +262,7 @@
     "exactScorePoints": "🎯 Exact score points",
     "groupWinnerPoints": "👥 Group winner points",
     "stageWinnerPoints": "🏆 Stage winner points",
+    "penaltyWinnerPoints": "🥅 Penalty advance bonus",
     "firstPlaceWinner": "🥇 1st place winner",
     "secondPlaceWinner": "🥈 2nd place winner",
     "thirdPlaceWinner": "🥉 3rd place winner",
@@ -354,7 +363,8 @@
     "correctGroupWinner": "👥 Correct group winner",
     "correctStageWinner": "🏆 Correct stage winner",
     "correctMatchWinner": "⚽ Correct match winner",
-    "exactMatchScore": "🎯 Exact match score"
+    "exactMatchScore": "🎯 Exact match score",
+    "penaltyWinner": "🥅 Guess who advances in knockout stages"
   },
   "language": {
     "label": "Language",

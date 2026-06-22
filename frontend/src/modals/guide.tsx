@@ -178,6 +178,7 @@ function ScoringRulesBody({ tournamentId }: { tournamentId: number | null }) {
     { label: t('scoringRule.correctStageWinner'), points: tournament.stage_winner_points },
     { label: t('scoringRule.correctMatchWinner'), points: tournament.match_winner_points },
     { label: t('scoringRule.exactMatchScore'), points: tournament.match_score_points },
+    { label: t('scoringRule.penaltyWinner'), points: tournament.penalty_winner_points },
   ].filter((r) => r.points != null && r.points !== 0)
 
   return (

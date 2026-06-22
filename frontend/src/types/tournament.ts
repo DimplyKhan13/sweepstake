@@ -32,6 +32,7 @@ export interface Tournament {
   match_score_points: number | null
   group_winner_points: number | null
   stage_winner_points: number | null
+  penalty_winner_points: number | null
   admin_lst: TournamentUser[]
   participant_lst: TournamentUser[]
   start_date: string | null
@@ -55,6 +56,7 @@ export interface TournamentCreate {
   match_score_points?: number
   group_winner_points?: number
   stage_winner_points?: number
+  penalty_winner_points?: number
 }
 
 export interface TournamentUpdate extends Partial<TournamentCreate> {}

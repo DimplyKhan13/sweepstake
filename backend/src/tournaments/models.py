@@ -61,6 +61,7 @@ class TournamentBase(SQLModel):
     match_score_points: Optional[int] = Field(default=5, ge=0)
     group_winner_points: Optional[int] = Field(default=8, ge=0)
     stage_winner_points: Optional[int] = Field(default=0, ge=0)
+    penalty_winner_points: Optional[int] = Field(default=2, ge=0)
 
 
 class Tournament(TournamentBase, table=True):

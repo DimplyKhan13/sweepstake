@@ -24,6 +24,7 @@ export interface Stage {
   tournament_id: number
   winner_team_id: number | null
   winner: TeamRead | null
+  is_knockout: boolean
   start_date: string | null
   end_date: string | null
 }
@@ -32,9 +33,11 @@ export interface StageCreate {
   name: string
   tournament_id: number
   winner_team_id?: number
+  is_knockout?: boolean
 }
 
 export interface StageUpdate {
   name?: string
   winner_team_id?: number | null
+  is_knockout?: boolean
 }

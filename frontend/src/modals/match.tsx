@@ -146,6 +146,7 @@ export function MatchModal({
   const [stageId, setStageId] = useState(match?.stage_id?.toString() ?? '')
   const [homeGoals, setHomeGoals] = useState(match?.home_goals?.toString() ?? '')
   const [awayGoals, setAwayGoals] = useState(match?.away_goals?.toString() ?? '')
+  const [penaltyWinnerId, setPenaltyWinnerId] = useState(match?.penalty_winner_team_id?.toString() ?? '')
   const [tvChannel, setTvChannel] = useState(match?.tv_channel ?? '')
   const [error, setError] = useState<string | null>(null)
   const [teamPickerFor, setTeamPickerFor] = useState<'home' | 'away' | null>(null)
@@ -160,6 +161,8 @@ export function MatchModal({
     }
     try {
       if (match) {
+        const isDraw =
+          homeGoals !== '' && awayGoals !== '' && Number(homeGoals) === Number(awayGoals)
         await updateMatch({
           id: match.id,
           tournamentId,
@@ -170,6 +173,7 @@ export function MatchModal({
             stage_id: stageId ? Number(stageId) : undefined,
             home_goals: homeGoals !== '' ? Number(homeGoals) : null,
             away_goals: awayGoals !== '' ? Number(awayGoals) : null,
+            penalty_winner_team_id: isDraw && penaltyWinnerId ? Number(penaltyWinnerId) : null,
             tv_channel: tvChannel || null,
           },
         }).unwrap()
@@ -323,6 +327,45 @@ export function MatchModal({
               />
             </div>
           </div>
+          {homeGoals !== '' && awayGoals !== '' && Number(homeGoals) === Number(awayGoals) && (
+            <div>
+              <FieldLabel>{t('match.penWinner')}</FieldLabel>
+              <div className="flex gap-2">
+                {[
+                  { id: homeTeamId, team: homeTeam, label: t('match.homeTeam') },
+                  { id: awayTeamId, team: awayTeam, label: t('match.awayTeam') },
+                ].map(({ id, team, label }) => {
+                  if (!id) return null
+                  const selected = penaltyWinnerId === id
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => setPenaltyWinnerId(selected ? '' : id)}
+                      className={[
+                        'flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-sm font-medium transition disabled:opacity-50',
+                        selected
+                          ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-400 dark:border-blue-500 text-blue-700 dark:text-blue-300'
+                          : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-600',
+                      ].join(' ')}
+                    >
+                      {team?.image_url && (
+                        <img
+                          src={team.image_url}
+                          alt={team.name}
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                          className="h-4 w-4 rounded-full object-cover border border-gray-200 dark:border-gray-600 flex-shrink-0"
+                        />
+                      )}
+                      {team?.name ?? label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
           <div>
             <FieldLabel>{t('match.tvChannel')}</FieldLabel>
             <input

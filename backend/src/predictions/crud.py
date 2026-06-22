@@ -291,12 +291,15 @@ async def upsert_predict_match(
     if existing:
         existing.home_score = data.home_score
         existing.away_score = data.away_score
+        if "penalty_winner_team_id" in data.model_fields_set:
+            existing.penalty_winner_team_id = data.penalty_winner_team_id
     else:
         existing = models.PredictMatch(
             match_id=data.match_id,
             user_id=user_id,
             home_score=data.home_score,
             away_score=data.away_score,
+            penalty_winner_team_id=data.penalty_winner_team_id,
         )
         db.add(existing)
     await db.flush()

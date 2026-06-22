@@ -48,6 +48,7 @@ export interface MatchPrediction {
   user_id: number
   home_score: number | null
   away_score: number | null
+  penalty_winner_team_id: number | null
   points_earned: number | null
 }
 
@@ -55,4 +56,5 @@ export interface MatchPredictionUpsert {
   match_id: number
   home_score?: number
   away_score?: number
+  penalty_winner_team_id?: number | null
 }

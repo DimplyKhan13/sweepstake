@@ -169,6 +169,10 @@ class PredictMatch(SQLModel, table=True):
     )
     home_score: Optional[int] = Field(default=None, ge=0)
     away_score: Optional[int] = Field(default=None, ge=0)
+    penalty_winner_team_id: Optional[int] = Field(
+        default=None,
+        sa_column=sa.Column(sa.Integer, nullable=True),
+    )
     points_earned: Optional[int] = Field(
         default=None,
         sa_column=sa.Column(sa.Integer, nullable=True),
@@ -180,6 +184,7 @@ class PredictMatchCreate(SQLModel):
     match_id: int
     home_score: Optional[int] = Field(default=None, ge=0)
     away_score: Optional[int] = Field(default=None, ge=0)
+    penalty_winner_team_id: Optional[int] = Field(default=None)
 
 
 class PredictMatchRead(SQLModel):
@@ -190,4 +195,5 @@ class PredictMatchRead(SQLModel):
     user_id: int
     home_score: Optional[int] = None
     away_score: Optional[int] = None
+    penalty_winner_team_id: Optional[int] = None
     points_earned: Optional[int] = None
