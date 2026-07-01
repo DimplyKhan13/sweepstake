@@ -9,6 +9,7 @@ They update the `points_earned` column on the relevant Predict* rows.
 """
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import AsyncSessionLocal
@@ -160,7 +161,10 @@ def _compute_match_points(
 async def recalculate_match_points(db: AsyncSession, match_id: int) -> None:
     """Recalculate points_earned for every PredictMatch row for a single match."""
     with sentry_sdk.start_span(op="scoring.recalculate_match_points", name=f"match_id={match_id}") as span:
-        match = await db.get(Match, match_id)
+        result = await db.execute(
+            select(Match).where(Match.id == match_id).options(selectinload(Match.stage))
+        )
+        match = result.scalar_one_or_none()
         if match is None:
             return
         tournament = await db.get(Tournament, match.tournament_id)
@@ -188,7 +192,7 @@ async def recalculate_all_match_points_for_tournament(db: AsyncSession, tourname
             return
 
         matches_result = await db.execute(
-            select(Match).where(Match.tournament_id == tournament_id)
+            select(Match).where(Match.tournament_id == tournament_id).options(selectinload(Match.stage))
         )
         total = 0
         for match in matches_result.scalars().all():
