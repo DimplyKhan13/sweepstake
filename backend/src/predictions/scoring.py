@@ -137,9 +137,21 @@ def _compute_match_points(
     else:
         base = 0
 
+    # Determine which team actually advanced in knockout matches.
+    # Penalty matches: explicit penalty_winner_team_id.
+    # Regular-time knockout wins: the match winner advances (no penalty_winner_team_id set).
+    actual_advance: int | None = None
     if match.penalty_winner_team_id is not None:
+        actual_advance = match.penalty_winner_team_id
+    elif match.stage is not None and match.stage.is_knockout:
+        if match.home_goals > match.away_goals:
+            actual_advance = match.home_team_id
+        elif match.away_goals > match.home_goals:
+            actual_advance = match.away_team_id
+
+    if actual_advance is not None:
         predicted_advance = _predicted_advance(pred, match)
-        if predicted_advance is not None and predicted_advance == match.penalty_winner_team_id:
+        if predicted_advance is not None and predicted_advance == actual_advance:
             base += tournament.penalty_winner_points or 0
 
     return base
